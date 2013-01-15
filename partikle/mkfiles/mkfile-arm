@@ -1,0 +1,37 @@
+# toolchain configuration
+#TC_PATH=/opt/x86-arm/usr/bin/
+#TC_PREF=arm-linux-
+
+TC_PATH=/usr/local/arm/gnuarm-3.4.3/bin/
+TC_PREF=arm-elf-
+TC_SUF=
+
+# commands
+CC		= $(TC_PATH)$(TC_PREF)gcc$(TC_SUF)
+LD		= $(TC_PATH)$(TC_PREF)ld$(TC_SUF)
+NM		= $(TC_PATH)$(TC_PREF)nm$(TC_SUF)
+SIZE	= $(TC_PATH)$(TC_PREF)size$(TC_SUF)
+OBJCOPY	= $(TC_PATH)$(TC_PREF)objcopy$(TC_SUF)
+OBJDUMP	= $(TC_PATH)$(TC_PREF)objdump$(TC_SUF)
+
+CXX		= $(TC_PATH)$(TC_PREF)g++$(TC_SUF)
+GCJ		= $(TC_PATH)$(TC_PREF)gcj$(TC_SUF)
+GCJH	= $(TC_PATH)$(TC_PREF)gcjh$(TC_SUF)
+JAR		= $(TC_PATH)$(TC_PREF)jar$(TC_SUF)
+
+LIBGCC= `$(CC) -print-libgcc-file-name`
+
+# architecture dependent flags
+CFLAGS += -mapcs-32
+ASFLAGS += -mapcs-32
+
+ifdef CONFIG_ARMV4
+CFLAGS += -march=armv4
+ASFLAGS += -march=armv4
+endif
+
+ifdef CONFIG_ARMV5
+CFLAGS += -march=armv5
+ASFLAGS += -march=armv5
+endif
+

@@ -1,0 +1,34 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Installation}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Linux Installation}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{XtratuM Installation}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{PaRTiKle Installation}{section.2}% 5
+\BOOKMARK [3][-]{subsubsection.2.3.1}{About Partikle}{subsection.2.3}% 6
+\BOOKMARK [3][-]{subsubsection.2.3.2}{PaRTiKle in XM/eRTL}{subsection.2.3}% 7
+\BOOKMARK [3][-]{subsubsection.2.3.3}{Requirements for installing partikle}{subsection.2.3}% 8
+\BOOKMARK [3][-]{subsubsection.2.3.4}{Installation}{subsection.2.3}% 9
+\BOOKMARK [2][-]{subsection.2.4}{Tools Usage}{section.2}% 10
+\BOOKMARK [1][-]{section.3}{Inter-Domain Communication Tools}{}% 11
+\BOOKMARK [2][-]{subsection.3.1}{XM/FIFO}{section.3}% 12
+\BOOKMARK [3][-]{subsubsection.3.1.1}{About XM/FIFO}{subsection.3.1}% 13
+\BOOKMARK [3][-]{subsubsection.3.1.2}{Characteristics}{subsection.3.1}% 14
+\BOOKMARK [3][-]{subsubsection.3.1.3}{Using XM/FIFO}{subsection.3.1}% 15
+\BOOKMARK [2][-]{subsection.3.2}{XM/SHM}{section.3}% 16
+\BOOKMARK [3][-]{subsubsection.3.2.1}{About XM/SHM}{subsection.3.2}% 17
+\BOOKMARK [3][-]{subsubsection.3.2.2}{XtratuM/SHM APIs}{subsection.3.2}% 18
+\BOOKMARK [3][-]{subsubsection.3.2.3}{Usage Example}{subsection.3.2}% 19
+\BOOKMARK [1][-]{section.4}{Device Driver}{}% 20
+\BOOKMARK [2][-]{subsection.4.1}{Device Driver Model}{section.4}% 21
+\BOOKMARK [3][-]{subsubsection.4.1.1}{Introduction}{subsection.4.1}% 22
+\BOOKMARK [3][-]{subsubsection.4.1.2}{Development}{subsection.4.1}% 23
+\BOOKMARK [2][-]{subsection.4.2}{XM/Serial Driver}{section.4}% 24
+\BOOKMARK [3][-]{subsubsection.4.2.1}{About XM/Serial Driver}{subsection.4.2}% 25
+\BOOKMARK [3][-]{subsubsection.4.2.2}{Using XM/Serial Driver}{subsection.4.2}% 26
+\BOOKMARK [1][-]{section.5}{xmtrace - Trace Tool}{}% 27
+\BOOKMARK [2][-]{subsection.5.1}{Run an Example}{section.5}% 28
+\BOOKMARK [2][-]{subsection.5.2}{Using the Tracer}{section.5}% 29
+\BOOKMARK [1][-]{section.6}{Examples}{}% 30
+\BOOKMARK [2][-]{subsection.6.1}{Domain}{section.6}% 31
+\BOOKMARK [2][-]{subsection.6.2}{Thread}{section.6}% 32
+\BOOKMARK [1][-]{appendix.A}{List of Hypercalls}{}% 33
+\BOOKMARK [1][-]{appendix.B}{List of Acronyms}{}% 34

@@ -1,0 +1,58 @@
+TODO
+----
+
+* Check ARCH when distclean, clean is launched 					(done)
+* Menuconfig, sort options again.						(done)
+* Include data2c								(done)
+* Write an INSTALL file, README file, etc.            		          	(done)
+* Miss the dependency file (core/kernel/$ARCH/dep.mk)           		(done)
+* Document the new partikle configuration file                  		(done)
+* Check iopl/io is usable from all $ARCHes					(done)
+* Remove debugging code, ie. printf("CONTEXT SWITCH\n")         		(done)
+* grep -rine 'TODO' . | grep -v svn						(in progress)
+* testing: user/regression_test is a suitable place for				(done)
+  automatic tests, this can be used with <assert.h>,
+  and defining a set of tests return values like 
+  user/regression_test/regression.h, like:
+  #define TEST_OK 	0
+  #define TEST_FAIL	1
+  so resulting partikle applications can be used under Linux
+  (under control) of a shell-script to do testing.
+* Since the purpose of openposixtestsuite is to provide a set of		(done)
+  standard (thus not modificable) tests it makes sense to not deliver 
+  the whole openposixtestsuite (45Mb) within partikle, instead,
+  the directory user/posixtestsuite/ can be used to contain:
+   - README.Partikle, which instructs to download the posixtestsuite,
+     extract it under user/posixtestsuite and aply the following patch
+   - posixtestsuite-partikle.patch, which only contain the changes
+   done to posixtestsuite Makefile.
+* include the PaRTiKle's user manual at documentation directory doc/		(done)
+* add the following devcons.c files: 						(done)
+  /dev/console/{cons,null,driver,random}
+
+* race condition in putchar_terminal() for partikle_i386 (koutput.c)
+* arguments for linux (access linux process argv[]) and i386 (as multiboot)	(1/2)
+* functions to work with paths (mainly for open calls):
+	- validname: sanity of names
+	- cleanname: remove ////, and ././ ...
+	- skipslash:
+
+* it'll be good to have a basic set of devices available under all the EENV,
+  with a portable implementation (like core/kernel/port/devcons.c), 
+  examples could be disks ide, cf, ram. This gives an homogenous use independently
+  of which EENV are you using. To test this the easiest would be to write a ramfs.
+  
+* missing sprintf/snprintf (on core/libc stdio.h) to be used by core/kernel/	(done)
+* missing fprintf (on core/libc stdio.h) to be used by core/kernel/		(done)
+  it would be good also to revise/reorder all the *printf/*scanf functions
+  since they're also the biggest, probably the better would be to separe them
+  to suit to small systems requirements.
+* add xtratum devrtf.c								(done)
+* make devtrace.c more portable (linux->file, xm->rtfifo, native->serial)	(in progress)
+  probably this should be available under a form of an optional /proc filesystem
+  taking care of the following, or at least a reasonable compromise of:
+  - non intrusive tracing code (it shouldn't interfere with functional code)
+  - shouldn't affect performance (probably better is conditional compilation)
+  - non overloading tracing code: {1 if check x syscall, 1 fn call x syscall}
+  at some point `info -f gdb.info -n Remote` whill be needed,
+  both for tracing and debugging.

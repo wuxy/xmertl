@@ -1,0 +1,1 @@
+cmd_/home/wuxy/xmertl/xtratum/devs/rtfifo/linux/lfifo.ko := ld -m elf_i386 -m elf_i386 -r -o /home/wuxy/xmertl/xtratum/devs/rtfifo/linux/lfifo.ko /home/wuxy/xmertl/xtratum/devs/rtfifo/linux/lfifo.o /home/wuxy/xmertl/xtratum/devs/rtfifo/linux/lfifo.mod.o

@@ -1,0 +1,1 @@
+cmd_/home/wuxy/xmertl/xtratum/devs/serial/serial.ko := ld -m elf_i386 -m elf_i386 -r -o /home/wuxy/xmertl/xtratum/devs/serial/serial.ko /home/wuxy/xmertl/xtratum/devs/serial/serial.o /home/wuxy/xmertl/xtratum/devs/serial/serial.mod.o

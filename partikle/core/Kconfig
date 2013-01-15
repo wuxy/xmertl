@@ -1,0 +1,76 @@
+# Plug and Play configuration
+
+menu "Core Options"
+config KDYNAMIC_MEMORY
+	int  "Kernel dynamic memory"
+	default 2097152
+	help
+		Amount of dynamic memory for the kernel (bytes).
+		
+config UDYNAMIC_MEMORY
+	int "User dynamic memory"
+	default 1047552
+	help
+		Amount of dynamic memory for the application (bytes).
+
+config VERBOSE_COMPILE
+	bool "Verbose Compiling"
+	default n
+	help
+		Display compilation information while building the PaRTiKle
+		system.
+
+		Enable this option only if the compilation of PaRTiKle fails,
+		then report the output to the developers.
+
+config DEBUGGING
+	bool "Debugging support"
+	default n
+	help
+		If you say Yes, then both, PaRTiKle and applications, will be
+		compiled with the "-g" flag enabled. It allows you to debug
+		your application with a debugger, like gdb.
+
+config FP_SUPPORT
+	bool "Floating Point Support"
+	default n
+	help
+		Enable PaRTiKLe to use the FPU
+
+endmenu
+
+menu "Ulibc Options"
+
+config ULIBC_ERRSTR
+	bool "Include error messages for the codes in errno.h" 
+	default y
+	help
+		This option can be useful, while developing and testing code
+		and can be disabled for the construction of production code.
+		Since error messages increment in 5 kbytes the kernel size.
+
+endmenu
+
+menu "Language Support"
+
+config ADA_SUPPORT
+	bool "Enable Ada Support" 
+	default n
+	select FP_SUPPORT   
+
+config GNAT_PATH
+	string "GNAT Path" if ADA_SUPPORT
+	default "/opt/gnat2005"
+        help
+	  This should point to the location of the gnat compiler suite,
+	  to the base directory containing the bin/ directory.
+
+config CXX_SUPPORT
+	bool "Enable C++ Support" 
+	default n
+
+config JAVA_SUPPORT
+	bool "Enable Java Support"
+	default n
+
+endmenu

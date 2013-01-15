@@ -1,0 +1,57 @@
+PaRTiKle overview
+=================
+
+PaRTiKle is a real time kernel designed to be POSIX compatible.
+The native API is ``C'' POSIX threads.
+
+It is a full-featured, flexible, configurable, real time embedded
+kernel. The kernel provides thread scheduling, synchronization, timer,
+and communication primitives. It handles hardware resources such as
+interrupts, exceptions, memory, timers, etc.
+
+PaRTiKle API
+============
+
+PaRTiKle implements the PSE51 interface. Furthermore, to ease the
+transition from RTLinux to PaRTiKle, PaRTiKle also gives support for the
+RTLinux's *_np routines.
+
+Supported Languages
+===================
+
+- C is fully supported.
+
+- C++ mechanisms (inheritance, polymorphism, exceptions, ...) are
+  fully supported. However, the porting of the C++ run-time library
+  is not available so far.
+
+* Although ALPHA versions of PaRTiKle already supported Java (GCJ) and
+Ada (GNAT), we'd rather remove this support till we have checked that
+it's working properly. Anyway, we don't discard to release the GCJ and
+the GNAT support as two add-on packages.
+
+
+Authors
+=======
+        Miguel Masmano [mmasmano@ai2.upv.es] (UPV)
+        Ismael Ripoll [iripoll@disca.upv.es](UPV)
+	Alfons Crespo [acrespo@disca.upv.es] (UPV)
+	Salva Peiro [speiro@ai2.upv.es] (UPV)
+	Vicent Brocal [vbrocal@ai2.upv.es] (UPV)
+
+Licence
+=======
+        GPL
+
+Bugs
+====
+        Right now, none.
+
+See also
+========
+	docs/, The docs/ directory contains the documentation:
+
+	docs/usermanual: contains a TeX usermanual to explain several PaRTiKle related issues.
+	docs/NOTES.rtldev: has installation notes to setup a development environment
+	docs/NOTES.fifo: explains how to use the XtratuM's fifo communication mechanism
+	docs/NOTES.fs: contains notes about the filesystem

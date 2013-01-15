@@ -1,0 +1,16 @@
+This contains some code to work with the lpc2000 devices
+in particular the LPC2136, it contains support for:
+	- arm7 initialization code,
+	- interrupts
+	- serial uart
+	- rtc/timers
+	- thumb
+	- ...
+
+and it's been an attempt to develop a sane codebase
+to build other projects on top of it, that results 
+easy to use & maintain. The first project has been
+adding PaRTiKLe support for lpc2000.
+
+--
+salva

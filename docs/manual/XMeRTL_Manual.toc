@@ -1,0 +1,34 @@
+\contentsline {section}{\numberline {1}Introduction}{1}{section.1}
+\contentsline {section}{\numberline {2}Installation}{4}{section.2}
+\contentsline {subsection}{\numberline {2.1}Linux Installation}{4}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}XtratuM Installation}{7}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}PaRTiKle Installation}{11}{subsection.2.3}
+\contentsline {subsubsection}{\numberline {2.3.1}About Partikle}{11}{subsubsection.2.3.1}
+\contentsline {subsubsection}{\numberline {2.3.2}PaRTiKle in XM/eRTL}{11}{subsubsection.2.3.2}
+\contentsline {subsubsection}{\numberline {2.3.3}Requirements for installing partikle}{12}{subsubsection.2.3.3}
+\contentsline {subsubsection}{\numberline {2.3.4}Installation}{12}{subsubsection.2.3.4}
+\contentsline {subsection}{\numberline {2.4}Tools Usage}{14}{subsection.2.4}
+\contentsline {section}{\numberline {3}Inter-Domain Communication Tools}{16}{section.3}
+\contentsline {subsection}{\numberline {3.1}XM/FIFO}{16}{subsection.3.1}
+\contentsline {subsubsection}{\numberline {3.1.1}About XM/FIFO}{16}{subsubsection.3.1.1}
+\contentsline {subsubsection}{\numberline {3.1.2}Characteristics}{16}{subsubsection.3.1.2}
+\contentsline {subsubsection}{\numberline {3.1.3}Using XM/FIFO}{18}{subsubsection.3.1.3}
+\contentsline {subsection}{\numberline {3.2}XM/SHM}{20}{subsection.3.2}
+\contentsline {subsubsection}{\numberline {3.2.1}About XM/SHM}{20}{subsubsection.3.2.1}
+\contentsline {subsubsection}{\numberline {3.2.2}XtratuM/SHM APIs}{22}{subsubsection.3.2.2}
+\contentsline {subsubsection}{\numberline {3.2.3}Usage Example}{22}{subsubsection.3.2.3}
+\contentsline {section}{\numberline {4}Device Driver}{24}{section.4}
+\contentsline {subsection}{\numberline {4.1}Device Driver Model}{24}{subsection.4.1}
+\contentsline {subsubsection}{\numberline {4.1.1}Introduction}{24}{subsubsection.4.1.1}
+\contentsline {subsubsection}{\numberline {4.1.2}Development}{25}{subsubsection.4.1.2}
+\contentsline {subsection}{\numberline {4.2}XM/Serial Driver}{31}{subsection.4.2}
+\contentsline {subsubsection}{\numberline {4.2.1}About XM/Serial Driver}{31}{subsubsection.4.2.1}
+\contentsline {subsubsection}{\numberline {4.2.2}Using XM/Serial Driver}{33}{subsubsection.4.2.2}
+\contentsline {section}{\numberline {5}xmtrace - Trace Tool}{36}{section.5}
+\contentsline {subsection}{\numberline {5.1}Run an Example}{36}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}Using the Tracer}{41}{subsection.5.2}
+\contentsline {section}{\numberline {6}Examples}{43}{section.6}
+\contentsline {subsection}{\numberline {6.1}Domain}{43}{subsection.6.1}
+\contentsline {subsection}{\numberline {6.2}Thread}{46}{subsection.6.2}
+\contentsline {section}{\numberline {A}List of Hypercalls}{48}{appendix.A}
+\contentsline {section}{\numberline {B}List of Acronyms}{49}{appendix.B}

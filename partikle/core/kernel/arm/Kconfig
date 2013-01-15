@@ -1,0 +1,50 @@
+#
+# Plug and Play configuration
+#
+
+choice
+	prompt "ARM Board"
+	default BOARD_INTEGRATORCP
+	help
+
+config BOARD_INTEGRATORCP
+	bool "IntegratorCP"
+	help
+
+config BOARD_CERFCUBE255
+	bool "CerfCube 255"
+	help
+
+endchoice
+
+
+menu "CPU features"
+choice
+	prompt "ARM Processor"
+	default ARM926E if BOARD_INTEGRATORCP
+#	default ARM1026E if BOARD_CERFCUBE255
+
+config ARM926E
+	bool "ARM926E"
+	help
+
+#config ARM1026E
+#	bool "ARM1026E"
+#	help
+
+#config XSCALE
+#	bool "XSCALE"
+#	help
+
+endchoice
+
+config ARMV4
+	def_bool y if ARM926E 
+
+#|| ARM1026E
+
+#config ARMV5
+#	def_bool y if XSCALE
+
+endmenu
+

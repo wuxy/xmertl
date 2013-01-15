@@ -1,0 +1,22 @@
+config PORT_DEVUART
+	depends on ARCH_X86 || ARCH_LINUX || ARCH_XTRATUM
+	bool "Enable the serial uart device (i8250 based)"
+	help
+		When selected provides the following device files
+		/dev/uart/{uart%d, uart%dctl, uart%dstatus},
+		where "%d" is the correspoding serial port number
+		used to send/receive data through the serial line.
+
+config PORT_DEVTRACE
+	depends on ARCH_LINUX
+	bool "Enable devtrace (runtime execution traces)"
+	help
+		When selected provides the following device file
+		/dev/trace, which accepts the messages: "enable"/"disable"
+		to control the logging of syscalls and cpu time
+		to a .ktr file which can be viewed with Kiwi.
+
+		See also the exampled provided: users/regressions_tests/devtrace.c.
+
+		NOTE: This can be useful on testing phases
+		but is advisable to disable it for the final version.

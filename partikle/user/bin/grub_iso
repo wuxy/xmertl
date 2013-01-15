@@ -1,0 +1,49 @@
+#!/bin/sh
+# generate a bootable iso with grub & .prtk kernel files
+
+# user configurable variables 
+isodir=$HOME/work/prtk
+isofile=$HOME/work/prtk.iso
+stg2torito=/lib/grub/i386-pc/stage2_eltorito
+
+# make ISO directory
+if ! test -d $iso_dir; then
+       mkdir $iso_dir
+fi
+
+# make a directory for GRUB
+if ! test -d $isodir; then
+       mkdir -p $isodir/boot/grub
+fi
+     
+# copy the file stage2_eltorito:
+if ! test -f $isodir/boot/grub/stage2_eltorito; then
+       if ! test -f $stg2torito; then
+               echo "error: grub stage2_eltorito not found!"
+               exit
+       fi
+       cp $stg2torito $isodir/boot/grub
+fi
+
+if test -z "$*"; then
+       echo "usage: $(basename $0) kernel-to-boot ..."
+       exit
+fi
+
+# generate a proper menu.lst
+(
+       echo    default 0
+       echo    timeout 4
+       for f in $*; do
+               if test -f $f; then
+                       cp $f $isodir/boot/grub/
+                       echo "title=`basename $f`"
+                       echo "kernel /boot/grub/`basename $f`"
+               fi
+       done
+) > $isodir/boot/grub/menu.lst
+
+# make a ISO9660 image file like this:
+mkisofs -R -b boot/grub/stage2_eltorito -no-emul-boot \
+         -boot-load-size 4 -boot-info-table -o $isofile $isodir
+

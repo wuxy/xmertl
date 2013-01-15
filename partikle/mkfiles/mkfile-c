@@ -1,0 +1,34 @@
+
+# compile apps using wrappers
+CC = $(PRTK)/user/bin/pgcc
+LD = $(PRTK)/user/bin/ldkernel
+
+# shouldn't be here
+OBJCOPY=arm-objcopy	
+OBJDUMP=arm-objdump
+SIZE=size
+
+%.hex: %.prtk
+	@echo $(shell basename $(OBJCOPY)) $@ $<
+	$(Q3)$(OBJCOPY) -O ihex $< $@
+
+%.bin: %.prtk
+	@echo $(shell basename $(OBJCOPY)) $@ $<
+	$(Q3)$(OBJCOPY) -O binary --gap-fill 0 $< $@
+
+%.prtk: %.o
+	@echo $(shell basename $(LD)) -o $@ $^ $(LDFLAGS) 
+	$(Q3)$(LD) -o $@ $^ $(LDFLAGS) 
+
+%.o: %.c
+	@echo $(shell basename $(CC)) -c -o $@ $^ $(CFLAGS)
+	$(Q3)$(CC) -c -o $@ $^ $(CFLAGS) 
+
+%.sym: %.prtk
+	$(NM) -n $< > $@
+%.size: %.prtk
+	$(SIZE) $<
+	$(SIZE) -A $< > $@
+%.dump: %.prtk
+	$(OBJDUMP) -D $< > $@
+

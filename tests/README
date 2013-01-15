@@ -1,0 +1,27 @@
+This is used to test the XMeRTL system automatically.  It includes
+
+XtratuM test
+PaRTiKle test
+FIFO test
+SHM test
+Trace Test
+
+
+Before you test the suits, you should change the bellow veriable value:
+config.mk: 
+	XMERTL_ROOT=Your_EMERTL_ROOT_PATH
+	such as:
+	XMERTL_ROOT=/home/gits/xmertl-4.0-rc1	
+start_test.sh
+	XMERTL_ROOT=Your_EMERTL_ROOT_PATH
+	such as:
+	XMERTL_ROOT=/home/gits/xmertl-4.0-rc1	
+
+When you finish the enviroment setting. You can do the test same bellow.
+
+
+# make
+# ./start_test.sh
+
+
+Bai Shuwei <bai.shuwei@weslab.com> or <baishuwei@dslab.lzu.edu.cn> 

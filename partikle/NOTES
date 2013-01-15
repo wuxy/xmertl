@@ -1,0 +1,54 @@
+# fast installation procedure:
+svn co https://www.gii.upv.es/svn/rtos/trunk/partikle
+cd partikle
+make menuconfig
+make
+cd user/examples/c_examples
+make
+... 
+and last run the corresponding examples acordingly
+
+# cross compilation on 64 bits host to 32 bits target
+see the instruction provided in mkfiles/mkfile-{linux,i386}
+
+# configuration file:
+One of the main benefits is that of having fully
+customised kernels, that are defined by a configuration file (say
+prtkcf), so one can start with a copy of the provided prtkcf and
+prepare a configuration file to build a kernel that is especially
+suited for the the task that the kernel/application are going to
+perform.
+
+# filesystem:
+We don't need user/group/others permissions, at some point just rwx
+could be enough, but currently, even x could be prescindible.
+Operations over files (all resources should be named -> all resources
+should be files)
+
+Minimal builtin root fs: core/kernel/prot/devroot.c
+core/kernel/linux/prtkcf [1] & [2] By now devroot.c implements a
+minimal builtin fs, but consider having a devfs to multiplex
+filesystem requests to all the files accesible {devices, files, etc.}
+
+Consider a device (devhost.c) that allows access to the Linux (host)
+filesystem from PaRTiKle.  Also linux trace.c cound be implemented as
+a device devtrace.c and use devhost.c to write a linux trace file.
+
+# devices
+/* generic device open function, to be called from open_sys?
+ * - functionality to provide generic {dev}open functions to fill each
+     particular device tables devtab.  
+ * - more ...
+ */
+
+Currently a device driver x (devx.c) [1] can only manage a set of
+files of the form: /dev/{x,x0,x1,x2,...,xn}, diferentiating the files
+by it's minor number.  It's also interesting to have
+/dev/{cons,null,zero,drivers}, managed by the same devcons.c
+
+# arm qemu testing with the toolchain:
+http://www.gnuarm.com/bu-2.15_gcc-3.4.3-c-c++-java_nl-1.12.0_gi-6.1.tar.bz2
+make -C user/examples/c_examples/ hello_world.bin
+qemu-arm-system -nographic -kernel hello_world.bin
+
+[3] http://www.vitanuova.com/inferno/man/3/root.html

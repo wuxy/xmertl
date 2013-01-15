@@ -1,0 +1,64 @@
+#!/bin/bash
+# gnatmake-wrapper to compile PaRTiKle
+
+prtkdir=$(dirname $(which $0))
+if test -r $prtkdir/Config.scr; then
+	source $prtkdir/Config.scr
+else
+	echo $(basename $0) error: $prtkdir/Config.scr not found
+	exit
+fi
+
+progname=$(basename $0)
+warn (){
+	echo $progname $*
+}
+matchadb () {
+	awk '{
+	for (i=1; i<=NF; i++)
+		if (match($i,/.+\.adb/)){
+			print $i;
+			exit;
+		}
+	}'
+}
+
+# parse options
+dontlink=
+if echo $@ | grep -qe '-c'; then
+	dontlink=1
+	set -- $(echo $@ | sed '/-c/ s/-c//')
+fi
+
+out=$(echo $@ | sed -n 's/.* -o \(.\+\)/\1/p')
+adb=$(echo $@ | matchadb)
+obj=$(echo $adb | sed -n 's/\..\+$//p')
+
+if test -z $out; then
+	out=$obj.prtk
+else
+	set -- $(echo $@ | sed -n "s|$out|$obj|p")
+fi
+#echo $0: adb $adb - out $out - obj $obj; exit 1
+
+ULIBC=$PRTK/user/ulibc/libc/ulibc.a
+USER_ENTRY_POINT=$PRTK/user/ulibc/libc/user_entry_point.o
+GNATMAKE=$GNAT_PATH/bin/gnatmake
+GNATMAKEFLAGS="-a -i -O2 -nostdlib -nostdinc -I$PRTK/user/lang_support/ada/GAP2005/ --RTS=rts-sjlj"
+GNATLINKFLAGS="-nostdlib -r $PRTK/user/lang_support/libpgnat.a $USER_ENTRY_POINT $ULIBC $LIBGCC"
+
+if test ! -f $PRTK/core/partikle_core.o; then
+	warn error: $PRTK/core/partikle_core.o not found.
+	warn error: Has PaRTiKle core been correctly compiled?
+	exit -1
+fi;
+
+# All the following commands have to run corrently in order to build the target.
+set -o errexit
+
+$GNATMAKE $@ $GNATMAKEFLAGS -largs $GNATLINKFLAGS
+
+if test -z $dontlink; then
+	$OBJCOPY -G user_entry_point $obj
+	$LD -L$PRTK/core -S -T$PRTK/core/kernel/$ARCH/partikle.lds -o $out $obj
+fi

@@ -1,0 +1,61 @@
+%% -*-LaTeX-*- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% kfi.tex
+% $Log$
+% Revision 1.2  2007/10/11 19:50:51  florian
+% first review for RTLWS07
+%
+% Revision 1.1  2006-12-06 19:46:26  andreas
+% commited initial draft of the redd_kickstart manual
+%
+% Revision 1.2  2005/01/18 21:44:41  georgs
+% removed a typo in kfi.tex
+% added a directory for the uml review:
+% doc/implementation/uml_review/
+% not completed yet, just prepared!
+% updated the week report
+%
+% Revision 1.1  2005/01/18 19:51:19  georgs
+% added kfi paper to doc/investigation/kfi-paper/
+% sources are in doc/investigation/kfi/...
+% furthermore i updated the week report
+%
+%
+
+\documentclass{latex/ot-doc}
+
+% Setup of the hyperref package
+
+\hypersetup{, 
+	colorlinks=true,
+	linkcolor=blue,
+	bookmarks=true}
+
+% Title
+
+\title{XMeRTL-4.0-rc1 Manual}
+\author{Distributed \& Embedded System Lab}
+\date{\today}
+
+%\extrachapter{Acknowledgments}
+
+%\begin{acknowledgments}
+%\end{acknowledgments}
+
+% The document, please keep the structure defined here
+\begin{document}
+
+\input{acknowledgements.tex}
+\newpage
+\tableofcontents
+\newpage
+% Fill in the name of your docu-file.
+%% \include{doc-ctrl}
+\pagenumbering{arabic} % document with arabic page numbers
+\include{content}   
+\include{acronyms}   
+\include{bibliography}   
+
+\end{document}

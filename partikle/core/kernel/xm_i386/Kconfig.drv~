@@ -1,0 +1,8 @@
+config XTRATUM_FIFO
+	bool "Enable XtratuM fifos"
+	help
+		Choose this to use RT fifos (provided by xtratum)
+		as a communication mechanism between PaRTiKle and the other domains.
+
+		To use them you need to patch XtratuM to add FIFO support,
+		see the file docs/NOTES.fifo which contains a step by step guide to use the XtratuM fifos.

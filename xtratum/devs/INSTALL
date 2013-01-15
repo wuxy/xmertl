@@ -1,0 +1,75 @@
+XtratuM device driver INSTALL
+
+Author: Shuwei Bai <baishuwei@dslab.lzu.edu.cn or baishuwei@weslab.com>
+
+
+Contents
+	Introducation
+	Install XM/FIFO, XM/SHM, and XM/UART
+	Testing
+
+Introducation
+	
+	By far, the  UART, FIFO, SHM has been updated to meet the new device driver model. In the new model, The drivers are divide into two parts which are separated into linux module and domain-driver respectively. Resouce initilization and release located in linux module and the driver body run as a driver domain on XtratuM. There are two important resouce are managed by the driver, one is memory and another is interrupt. Memory allocation and interrupt request consist of initilization module. And the ISR (interrupt service routine) run in the domain. In some driver, the interrupt is not neccessary, such as there is no interrupt in the FIFO driver.
+
+	In the document, the installation of xtratum device driver will be presented. XM/FIFO, XM/SHM and  XM/UART has been integrated into the new device driver model. Before reading the document you should know read XtratuM_PATH/INSTALL file and know how to install XtratuM system.
+
+Installation
+	
+	The installation of the device driver is simple. It start from the Linux-kernel-xm has boot.
+	#cd XtratuM_PATH
+
+	Compile the xtratum normally.
+
+	Load xtratum, rtfifo, serial, module by xm_pathc/user_tools/scripts/xmcmd.sh command.
+	# ../user_tools/scripts/xmcmd.sh -l
+	
+	Running serial device driver:
+		# cd user_tools/serial/
+		# make
+		# ../xmloader/loader.xm serial.xmd -prio 1 /* You can set it by yourself*/	
+		# cd -
+
+	Check the result:
+		# lsmod 
+		lshm                    3924  0 
+		shm                     5664  1 lshm
+		lfifo                   3200  0 
+		luart                   4136  0 
+		rtfifo                  4640  1 lfifo
+		serial                  6052  1 luart
+		xm                     38056  3 shm,rtfifo,serial
+		# cat /proc/xtratum
+
+		(1) serial.xmd:
+        		Priority: 1
+        		Intercepted events: 0x10
+        		Masked events: 0xffffffef
+        		Pending events: 0x0
+        		Events' flag is enabled
+        		Current state: SUSPENDED
+        		Domain's state word: 0x1
+
+		(0) Linux:
+        		Priority: 1023 (MIN. PRIORITY)
+        		Intercepted events: 0xffff
+        		Masked events: 0xffff0000
+        		Pending events: 0x0
+        		Events' flag is enabled
+        		Current state: ACTIVE
+        		Domain's state word: 0x0
+
+		# ls /dev/VttyS -al
+		crw-r--r-- 1 root root 240, 0 2008-09-22 09:00 /dev/VttyS
+
+Testing
+	XM/FIFO TESIING
+		The test suits for XM/FIFO are located in partikle/user/examples/c_examples/ directory.
+	XM/SHM  TESTING
+		SHM testing suits are built for XtratuM and PaRTiKle, so you can use user_tools/examples/shm/* to test XtratuM and use partikle/user/examples/c_examples/shm/* to test PaRTiKel.
+	XM/UART TESTING
+		xtratum/user_tools/tests/* files are uart testing suites for test the uart communication.
+
+	All the testing suits for Linux system is located in xtratum/devs/[devs_name]/linux/examples/ driectory. The devs_name can be shm, serial, rtfifo.
+
+    If you have problems on installation, you can write email to baishuwei@gmail.com free.

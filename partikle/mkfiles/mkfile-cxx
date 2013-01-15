@@ -1,0 +1,14 @@
+
+CC = $(PRTK)/user/bin/pgcc
+LD = $(PRTK)/user/bin/ldkernel
+
+CXXRUNTIME=$(PRTK)/user/lang_support/libsupc++.a
+
+%.prtk: %.o
+	@echo $(shell basename $(LD)) -o $@ $^ $(CXXRUNTIME)
+	$(Q3)$(LD) -o $@ $^ $(CXXRUNTIME)
+
+%o: %cc
+	@echo $(shell basename $(CXX))-c -o $@ $^ $(CXXFLAGS) 
+	$(Q3)$(CXX) -c -o $@ $^ $(CXXFLAGS) 
+

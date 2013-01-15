@@ -1,0 +1,32 @@
+#include "dev.h"
+#include "prtkcf.root.h"
+ulong ndevs = 10;
+
+extern Dev consdevtab;
+extern Dev rootdevtab;
+Dev* devtab[]={
+	&consdevtab,
+	&rootdevtab,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+};
+
+extern void koutputlink(void);
+extern void rtclink(void);
+extern void tsclink(void);
+extern void xmtimerlink(void);
+void links(void){
+	koutputlink();
+	rtclink();
+	tsclink();
+	xmtimerlink();
+}
+
+unsigned long kerndate = KERNDATE;

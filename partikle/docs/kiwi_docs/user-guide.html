@@ -1,0 +1,638 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 3.0">
+<title></title>
+</head>
+
+<body text="#000000" bgcolor="#ffffff" link="#0000ef" vlink="#51188e" alink="#ff0000">
+
+<h1>Kiwi 1.0 User Guide</h1>
+
+<p>July 1, 2003 <br>
+&nbsp; </p>
+
+<p><a href="#Installation">Installation</a> <br>
+<a href="#Interface">Interface</a> <br>
+<a href="#The%20Trace%20File">The Trace File</a> <br>
+<a href="#Using%20the%20Keyboard">Using the Keyboard</a> <br>
+<a href="#Using%20the%20Mouse">Using the Mouse</a> <br>
+<a href="#Trace%20Example">Trace Example</a> <br>
+<a href="#Author">Author</a></p>
+
+<p>&nbsp;</p>
+
+<h2><a name="Installation"></a><font color="#000099">Installation</font></h2>
+
+<p>Kiwi is fully written in Tcl/Tk and so, in order to run Kiwi, you need the Tcl/Tk
+interpreter installed on your system. Tcl/TK is available as a standard binary package for
+most of the Linux distributions. You have binary installation packages for Windows and
+MacOS as well. In any case, if you don't have a binary package for your system, you can
+always build it from its sources. Tcl/TK is available for virtually any Unix system and it
+is very easy to compile and install. Please, refer to the <a href="http://www.tcl.tk">Tcl
+Developer Xchange</a> homepage for details. </p>
+
+<p><b>Unix Systems</b> </p>
+
+<p>First, you must find the full pathname of the Tcl/TK interpreter which is installed in
+your system. The name of this interpreter is &quot;wish&quot; or &quot;wishN.M&quot; being
+N.M the version of Tcl/TK that you have. You can execute &quot;which wish&quot; for
+getting the full pathname of &quot;wish&quot;. Next, edit the first line in the file
+called &quot;kiwi&quot; and correct the full pathname of &quot;wish&quot; if necessary.
+That's all. You can run now Kiwi just by executing the file named &quot;kiwi&quot;. </p>
+
+<p><b>Windows Systems</b> </p>
+
+<p>You should rename the file &quot;kiwi&quot; to &quot;kiwi.tcl&quot;. You can run now
+Kiwi by double-clicking the icon of the file &quot;kiwi.tcl&quot;. </p>
+
+<p><b>MacOS Systems</b> </p>
+
+<p>No tested yet. Sorry. <br>
+&nbsp; </p>
+
+<h2><a name="Interface"></a> <font color="#000099">Interface</font></h2>
+
+<p><strong><font color="#000000">Main Buttons</font></strong></p>
+
+<p><img src="main.png" width="176" height="39" alt="main.png (470 bytes)">
+
+<ul>
+  <li>Open a trace file, Save as a new trace file</li>
+  <li>Take an snapshot of the current view as an EPS file</li>
+  <li>Play the trace file</li>
+  <li>Stop playing or drawing.</li>
+</ul>
+
+<p><strong>Main Drawing Options</strong></p>
+
+<p><img src="draw.png" width="260" height="46" alt="draw.png (837 bytes)">
+
+<ul>
+  <li>Adjust Zoom X.</li>
+  <li>Adjust Zoom Y </li>
+  <li>Select the Palette</li>
+  <li>Redraw (apply drawing options)</li>
+</ul>
+
+<p><strong>Viewer</strong></p>
+
+<p><img src="viewer.png" width="386" height="283" alt="viewer.png (3697 bytes)"></p>
+
+<p><strong>Tools</strong></p>
+
+<p><img src="tools.png" width="26" height="51" alt="tools.png (219 bytes)">
+
+<ul>
+  <li>Show/Hide the Events List pane</li>
+  <li>Show/Hide the Drawing Options pane</li>
+</ul>
+
+<p><strong>Move</strong></p>
+
+<p><img src="move.png" width="620" height="28" alt="move.png (796 bytes)">
+
+<ul>
+  <li>Go to the beginning of the trace&nbsp;</li>
+  <li>Fast backward</li>
+  <li>Normal backward</li>
+  <li>Slow backward</li>
+  <li>Current time point</li>
+  <li>Go to an specific time point</li>
+  <li>Delete duration and go-to lines</li>
+  <li>Slow forward</li>
+  <li>Normal forward</li>
+  <li>Fast forward</li>
+  <li>Go to the end of the trace</li>
+</ul>
+
+<p><strong>Information</strong></p>
+
+<p><img src="bottom.png" width="785" height="42" alt="bottom.png (1096 bytes)">
+
+<ul>
+  <li>Time-stamp of the first event in the trace file.</li>
+  <li>Time-stamp of the last event in the trace file.</li>
+  <li>Miniature.</li>
+  <li>Time length of the current view.</li>
+  <li>Time length of the current grid.</li>
+</ul>
+
+<p>&nbsp;</p>
+
+<h2><a name="The Trace File"></a> <font color="#000099">The Trace File</font></h2>
+
+<p align="left">A Kiwi trace file is a text file in which lines represent timed events.
+Each line is formed by five fields, being the space character used as the field separator.
+These fields are: </p>
+
+<p align="center"><tt>Time&nbsp;&nbsp; Event Type&nbsp;&nbsp; Arg1&nbsp;&nbsp;
+Arg2&nbsp;&nbsp; Arg3</tt></p>
+
+<p>The &quot;Time&quot; and &quot;Event Type&quot; fields are mandatory. The
+&quot;Arg1&quot;, &quot;Arg2&quot; and &quot;Arg3&quot; fields are used depending on the
+&quot;Event Type&quot; value, as follows: <br>
+&nbsp; <br>
+&nbsp; </p>
+<div align="center"><center>
+
+<table border="1" width="50%" nosave>
+<tbody>
+  <tr nosave>
+    <td colspan="2" nosave><b>Event Type</b></td>
+    <td><b>Arg1</b></td>
+    <td><b>Arg2</b></td>
+    <td><b>Arg3</b></td>
+  </tr>
+  <tr>
+    <td>0</td>
+    <td>START</td>
+    <td>Line</td>
+    <td>Color</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr nosave>
+    <td>1</td>
+    <td>STOP</td>
+    <td nosave>Line</td>
+    <td>Color</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>DEADLINE</td>
+    <td>Line</td>
+    <td>Color</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr nosave>
+    <td>3</td>
+    <td nosave>EXEC-B</td>
+    <td>Line</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>EXEC-E</td>
+    <td>Line</td>
+    <td>Color</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>READY-B</td>
+    <td>Line</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr nosave>
+    <td>6</td>
+    <td>READY-E</td>
+    <td nosave>Line</td>
+    <td>Color</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>7</td>
+    <td>LOCK</td>
+    <td>Line</td>
+    <td>Text</td>
+    <td>Color</td>
+  </tr>
+  <tr>
+    <td>8</td>
+    <td>UNLOCK</td>
+    <td>Line</td>
+    <td>Text</td>
+    <td>Color</td>
+  </tr>
+  <tr>
+    <td>9</td>
+    <td>ARROWDOWN</td>
+    <td>Line</td>
+    <td>Text</td>
+    <td>Color</td>
+  </tr>
+  <tr>
+    <td>10</td>
+    <td>ARROWUP</td>
+    <td>Line</td>
+    <td>Text</td>
+    <td>Color</td>
+  </tr>
+  <tr>
+    <td>11</td>
+    <td>BLOCK</td>
+    <td>Line</td>
+    <td>Text</td>
+    <td>Color</td>
+  </tr>
+  <tr>
+    <td>12</td>
+    <td>VLINE</td>
+    <td>text</td>
+    <td>Color</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>13</td>
+    <td>TEXTOVER</td>
+    <td>Line</td>
+    <td>Text</td>
+    <td>Color</td>
+  </tr>
+  <tr>
+    <td>14</td>
+    <td>TEXTUNDER</td>
+    <td>Line</td>
+    <td>Text</td>
+    <td>Color</td>
+  </tr>
+</tbody>
+</table>
+</center></div>
+
+<p>The requirements imposed on the field values are: 
+
+<ul>
+  <li>&quot;Time&quot; is a real number between 0.0 and 9999.999999999. It represents a time
+    point expressed in seconds. Lines in a Kiwi trace file must be sorted in ascending order
+    on this field.</li>
+  <li>&quot;Event Type&quot; must be one of the values listed in the table above. You can
+    either use&nbsp; the number listed in the first column or its corresponding name listed in
+    the second column.</li>
+  <li>&quot;Line&quot; is an integer number between 0 and 99.</li>
+  <li>&quot;Text&quot; is a string of characters. If the string contains space characters they
+    must be enclosed between &quot; &quot; or { }.</li>
+  <li>&quot;Color&quot; is an hexadecimal number which represents a RGB color using the format
+    #rrggbb or a symbolic color name valid for Tcl/TK (see the <a href="colors.html">&quot;n
+    colors&quot; man page</a> for details)</li>
+</ul>
+
+<p><br>
+You can set drawing options in the trace file. These drawing options are optional and they
+must be placed at the beginning of the trace file, before any timed event. Each option
+line is formed by four fields, being the space character used as the field separator.
+These fields are: </p>
+
+<p align="center"><tt>Drawing Option&nbsp;&nbsp; Arg1&nbsp;&nbsp; Arg2&nbsp;&nbsp; Arg3</tt></p>
+
+<p>The &quot;Drawing Option&quot; field is mandatory. The &quot;Arg1&quot;,
+&quot;Arg2&quot; and &quot;Arg3&quot; fields are used depending on the &quot;Drawing
+Option&quot; value, as follows: <br>
+&nbsp; </p>
+<div align="center"><center>
+
+<table border="1" width="50%" nosave>
+<tbody>
+  <tr nosave>
+    <td nosave><b>Drawing Option</b></td>
+    <td><b>Arg1</b></td>
+    <td><b>Arg2</b></td>
+    <td><b>Arg3</b></td>
+  </tr>
+  <tr>
+    <td>FROM</td>
+    <td>Time</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>DURATION</td>
+    <td>Time</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>ZOOM_X</td>
+    <td>Integer (-6 .. 38)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>ZOOM_Y</td>
+    <td>Integer (1 .. 48)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr nosave>
+    <td>PALETTE</td>
+    <td nosave>Palette Name</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>DECIMAL_DIGITS</td>
+    <td>Integer (0 .. 9)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>LINE_NAME</td>
+    <td>Line</td>
+    <td>Text</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>COLOR</td>
+    <td>Event Type&nbsp;</td>
+    <td>Line</td>
+    <td>Color</td>
+  </tr>
+</tbody>
+</table>
+</center></div>
+
+<h2><a name="Using the Keyboard"></a> <font color="#000099">Using the Keyboard</font></h2>
+
+<p align="center">&nbsp; </p>
+<div align="center"><center>
+
+<table border="1" width="50%" nosave>
+<tbody>
+  <tr nosave>
+    <td nosave><b>Key</b></td>
+    <td><b>Action</b></td>
+  </tr>
+  <tr>
+    <td>&lt;Control-o&gt;</td>
+    <td>Open a trace file</td>
+  </tr>
+  <tr>
+    <td>&lt;Control-s&gt;</td>
+    <td>Save the current trace as a new trace file</td>
+  </tr>
+  <tr>
+    <td>&lt;Control-r&gt;</td>
+    <td>Print the current view as an EPS file</td>
+  </tr>
+  <tr>
+    <td>&lt;Control-p&gt;</td>
+    <td>Play the current trace</td>
+  </tr>
+  <tr>
+    <td>&lt;Control-e&gt;</td>
+    <td>Show/Hide the Events List pane</td>
+  </tr>
+  <tr>
+    <td>&lt;Control-v&gt;</td>
+    <td>Show/Hide the Drawing Options pane</td>
+  </tr>
+  <tr>
+    <td>&lt;Escape&gt;</td>
+    <td>Stop playing and drawing</td>
+  </tr>
+  <tr>
+    <td>+</td>
+    <td>More Zoom X</td>
+  </tr>
+  <tr nosave>
+    <td>-</td>
+    <td nosave>Less Zoom X</td>
+  </tr>
+  <tr>
+    <td>&lt;Shift-+&gt;</td>
+    <td>More Zoom Y</td>
+  </tr>
+  <tr>
+    <td>&lt;Shift--&gt;</td>
+    <td>Less Zoom Y</td>
+  </tr>
+  <tr>
+    <td>&lt;Enter&gt;</td>
+    <td>Redraw</td>
+  </tr>
+  <tr>
+    <td>&lt;Space&gt;</td>
+    <td>Redraw</td>
+  </tr>
+  <tr>
+    <td>&lt;Home&gt;</td>
+    <td>Go to the beginning of the trace&nbsp;</td>
+  </tr>
+  <tr>
+    <td>&lt;Shift-Left&gt;</td>
+    <td>Slow backward</td>
+  </tr>
+  <tr>
+    <td>&lt;Left&gt;</td>
+    <td>Normal backward</td>
+  </tr>
+  <tr>
+    <td>&lt;PgUp&gt;</td>
+    <td>Fast backward</td>
+  </tr>
+  <tr nosave>
+    <td>&lt;Control-g&gt;</td>
+    <td nosave>Go to an specific time point</td>
+  </tr>
+  <tr>
+    <td>&lt;Delete&gt;</td>
+    <td>Delete duration and go-to lines</td>
+  </tr>
+  <tr>
+    <td>&lt;Shift-Right&gt;</td>
+    <td>Slow forward</td>
+  </tr>
+  <tr>
+    <td>&lt;Right&gt;</td>
+    <td>Normal forward</td>
+  </tr>
+  <tr>
+    <td>&lt;PgDn&gt;</td>
+    <td>Fast forward</td>
+  </tr>
+  <tr>
+    <td>&lt;End&gt;</td>
+    <td>Go to the end of the trace</td>
+  </tr>
+</tbody>
+</table>
+</center></div>
+
+<h2><a name="Using the Mouse"></a> <font color="#000099">Using the Mouse</font></h2>
+
+<p>&nbsp; </p>
+
+<table border="1" width="100%" nosave>
+<tbody>
+  <tr>
+    <td><b>Mouse</b></td>
+    <td><b>Where</b></td>
+    <td><b>Action</b></td>
+  </tr>
+  <tr>
+    <td>Move</td>
+    <td>Viewer</td>
+    <td>Set the Current Time Point</td>
+  </tr>
+  <tr>
+    <td>Move</td>
+    <td>Miniature</td>
+    <td>Set the Current Time Point</td>
+  </tr>
+  <tr>
+    <td>Move</td>
+    <td>Events List Pane</td>
+    <td>Points to the current event in the Events List Pane</td>
+  </tr>
+  <tr>
+    <td>Double-LeftButton</td>
+    <td>Viewer</td>
+    <td>Go to the Current Time Point</td>
+  </tr>
+  <tr nosave>
+    <td>Double-LeftButton</td>
+    <td nosave>Miniature</td>
+    <td>Go to the Current Time Point</td>
+  </tr>
+  <tr>
+    <td>Double-LeftButton</td>
+    <td>Events List Pane</td>
+    <td>Go to the current event in the Events List Pane</td>
+  </tr>
+  <tr>
+    <td>Drag-RightButton</td>
+    <td>Viewer</td>
+    <td>Make a Duration Line</td>
+  </tr>
+</tbody>
+</table>
+
+<p><br>
+&nbsp; </p>
+
+<h2><a name="Trace Example"></a> <font color="#000099">Trace Example</font></h2>
+
+<p><br>
+File demo.ktr </p>
+
+<p><tt><font size="-1">DECIMAL_DIGITS 0</font></tt> <br>
+<tt><font size="-1">DURATION 50</font></tt> <br>
+<tt><font size="-1">LINE_NAME 0 A</font></tt> <br>
+<tt><font size="-1">LINE_NAME 1 B</font></tt> <br>
+<tt><font size="-1">LINE_NAME 2 C</font></tt> <br>
+<tt><font size="-1">PALETTE Rainbow</font></tt> <br>
+<tt><font size="-1">ZOOM_X&nbsp;&nbsp;&nbsp; 4</font></tt> <br>
+<tt><font size="-1">ZOOM_Y&nbsp; 16</font></tt> <br>
+<tt><font size="-1">COLOR EXEC-E 0 orchid4</font></tt> </p>
+
+<p><tt><font size="-1">0&nbsp;&nbsp;&nbsp; READY-B 0</font></tt> <br>
+<tt><font size="-1">0&nbsp;&nbsp;&nbsp; READY-B 1</font></tt> <br>
+<tt><font size="-1">0&nbsp;&nbsp;&nbsp; READY-B 2</font></tt> <br>
+<tt><font size="-1">0&nbsp;&nbsp;&nbsp; START 0</font></tt> <br>
+<tt><font size="-1">0&nbsp;&nbsp;&nbsp; START 1</font></tt> <br>
+<tt><font size="-1">0&nbsp;&nbsp;&nbsp; START 2</font></tt> <br>
+<tt><font size="-1">0&nbsp;&nbsp;&nbsp; EXEC-B 0</font></tt> <br>
+&nbsp; </p>
+
+<p><tt><font size="-1">2&nbsp;&nbsp;&nbsp; READY-E 0</font></tt> <br>
+<tt><font size="-1">2&nbsp;&nbsp;&nbsp; STOP 0</font></tt> <br>
+<tt><font size="-1">2&nbsp;&nbsp;&nbsp; EXEC-E 0</font></tt> <br>
+<tt><font size="-1">2&nbsp;&nbsp;&nbsp; EXEC-B 1</font></tt> </p>
+
+<p><tt><font size="-1">5&nbsp;&nbsp;&nbsp; READY-E 1</font></tt> <br>
+<tt><font size="-1">5&nbsp;&nbsp;&nbsp; STOP 1</font></tt> <br>
+<tt><font size="-1">5&nbsp;&nbsp;&nbsp; EXEC-E 1</font></tt> <br>
+<tt><font size="-1">5&nbsp;&nbsp;&nbsp; EXEC-B 2</font></tt> </p>
+
+<p><tt><font size="-1">7&nbsp;&nbsp;&nbsp; ARROWUP 2 e2 orange</font></tt> </p>
+
+<p><tt><font size="-1">8&nbsp;&nbsp;&nbsp; ARROWDOWN 1 e1</font></tt> </p>
+
+<p><tt><font size="-1">9&nbsp;&nbsp;&nbsp; LOCK 2 s0</font></tt> <br>
+<tt><font size="-1">9&nbsp;&nbsp;&nbsp; EXEC-E 2</font></tt> <br>
+<tt><font size="-1">9&nbsp;&nbsp;&nbsp; EXEC-B 2</font></tt> </p>
+
+<p><tt><font size="-1">10&nbsp;&nbsp; DEADLINE 1</font></tt> </p>
+
+<p><tt><font size="-1">11&nbsp;&nbsp; DEADLINE 0</font></tt> <br>
+<tt><font size="-1">11&nbsp;&nbsp; READY-B 0</font></tt> <br>
+<tt><font size="-1">11&nbsp;&nbsp; START 0</font></tt> <br>
+<tt><font size="-1">11&nbsp;&nbsp; EXEC-E 2 gray70</font></tt> <br>
+<tt><font size="-1">11&nbsp;&nbsp; EXEC-B 0</font></tt> </p>
+
+<p><tt><font size="-1">13&nbsp;&nbsp; READY-E 0</font></tt> <br>
+<tt><font size="-1">13&nbsp;&nbsp; STOP 0</font></tt> <br>
+<tt><font size="-1">13&nbsp;&nbsp; EXEC-E 0</font></tt> <br>
+<tt><font size="-1">13&nbsp;&nbsp; READY-B 1</font></tt> <br>
+<tt><font size="-1">13&nbsp;&nbsp; START 1</font></tt> <br>
+<tt><font size="-1">13&nbsp;&nbsp; EXEC-B 1</font></tt> </p>
+
+<p><tt><font size="-1">14&nbsp;&nbsp; VLINE M1</font></tt> </p>
+
+<p><tt><font size="-1">15&nbsp;&nbsp; BLOCK 1 s0</font></tt> <br>
+<tt><font size="-1">15&nbsp;&nbsp; READY-E 1</font></tt> <br>
+<tt><font size="-1">15&nbsp;&nbsp; EXEC-E 1</font></tt> <br>
+<tt><font size="-1">15&nbsp;&nbsp; EXEC-B 2</font></tt> </p>
+
+<p><tt><font size="-1">17&nbsp;&nbsp; TEXTOVER&nbsp;&nbsp; 3 &quot;KIWI TRACE&quot; blue3</font></tt>
+<br>
+<tt><font size="-1">17&nbsp;&nbsp; TEXTUNDER 3 &quot;EXAMPLE&quot; blue3</font></tt> </p>
+
+<p><tt><font size="-1">20&nbsp;&nbsp; UNLOCK 2 s0</font></tt> <br>
+<tt><font size="-1">20&nbsp;&nbsp; LOCK 1 s0</font></tt> <br>
+<tt><font size="-1">20&nbsp;&nbsp; READY-B 1</font></tt> <br>
+<tt><font size="-1">20&nbsp;&nbsp; EXEC-E 2 gray70</font></tt> <br>
+<tt><font size="-1">20&nbsp;&nbsp; EXEC-B 1</font></tt> </p>
+
+<p><tt><font size="-1">21&nbsp;&nbsp; UNLOCK 1 s0</font></tt> <br>
+<tt><font size="-1">21&nbsp;&nbsp; READY-E 1</font></tt> <br>
+<tt><font size="-1">21&nbsp;&nbsp; STOP 1</font></tt> <br>
+<tt><font size="-1">21&nbsp;&nbsp; EXEC-E 1 gray70</font></tt> <br>
+<tt><font size="-1">21&nbsp;&nbsp; EXEC-B 2</font></tt> </p>
+
+<p><tt><font size="-1">22&nbsp;&nbsp; DEADLINE 0</font></tt> <br>
+<tt><font size="-1">22&nbsp;&nbsp; READY-B 0</font></tt> <br>
+<tt><font size="-1">22&nbsp;&nbsp; START 0</font></tt> <br>
+<tt><font size="-1">22&nbsp;&nbsp; EXEC-E 2</font></tt> <br>
+<tt><font size="-1">22&nbsp;&nbsp; EXEC-B 0</font></tt> </p>
+
+<p><tt><font size="-1">23&nbsp;&nbsp; DEADLINE 1</font></tt> </p>
+
+<p><tt><font size="-1">24&nbsp;&nbsp; READY-E 0</font></tt> <br>
+<tt><font size="-1">24&nbsp;&nbsp; STOP 0</font></tt> <br>
+<tt><font size="-1">24&nbsp;&nbsp; EXEC-E 0</font></tt> <br>
+<tt><font size="-1">24&nbsp;&nbsp; EXEC-B 2</font></tt> </p>
+
+<p><tt><font size="-1">26&nbsp;&nbsp; READY-B 1</font></tt> <br>
+<tt><font size="-1">26&nbsp;&nbsp; START 1</font></tt> <br>
+<tt><font size="-1">26&nbsp;&nbsp; EXEC-E 2</font></tt> <br>
+<tt><font size="-1">26&nbsp;&nbsp; EXEC-B 1</font></tt> </p>
+
+<p><tt><font size="-1">27&nbsp;&nbsp; ARROWUP 2 &quot;&quot; orange</font></tt> </p>
+
+<p><tt><font size="-1">29&nbsp;&nbsp; READY-E 1</font></tt> <br>
+<tt><font size="-1">29&nbsp;&nbsp; STOP 1</font></tt> <br>
+<tt><font size="-1">29&nbsp;&nbsp; EXEC-E 1</font></tt> <br>
+<tt><font size="-1">29&nbsp;&nbsp; EXEC-B 2</font></tt> </p>
+
+<p><tt><font size="-1">32&nbsp;&nbsp; READY-E 2</font></tt> <br>
+<tt><font size="-1">32&nbsp;&nbsp; STOP 2</font></tt> <br>
+<tt><font size="-1">32&nbsp;&nbsp; EXEC-E 2</font></tt> </p>
+
+<p><tt><font size="-1">33&nbsp;&nbsp; DEADLINE 0</font></tt> <br>
+<tt><font size="-1">33&nbsp;&nbsp; EXEC-B 0</font></tt> <br>
+<tt><font size="-1">33&nbsp;&nbsp; READY-B 0</font></tt> <br>
+<tt><font size="-1">33&nbsp;&nbsp; START 0</font></tt> </p>
+
+<p><tt><font size="-1">35&nbsp;&nbsp; READY-E 0</font></tt> <br>
+<tt><font size="-1">35&nbsp;&nbsp; STOP 0</font></tt> <br>
+<tt><font size="-1">35&nbsp;&nbsp; EXEC-E 0</font></tt> </p>
+
+<p><img src="demo.png" height="568" width="808"> <br>
+&nbsp; <br>
+&nbsp; </p>
+
+<h2><a name="Author"></a> <font color="#000099">Author</font></h2>
+
+<p>Kiwi was written by Agustín Espinosa Minguet (<a href="mailto:aespinos@dsic.upv.es">
+aespinos@dsic.upv.es</a> ) </p>
+
+<p>Please send me an e-mail for any comments about Kiwi. <br>
+&nbsp; </p>
+</body>
+</html>

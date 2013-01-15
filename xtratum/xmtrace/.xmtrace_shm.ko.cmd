@@ -1,0 +1,1 @@
+cmd_/home/wuxy/xmertl/xtratum/xmtrace/xmtrace_shm.ko := ld -m elf_i386 -m elf_i386 -r -o /home/wuxy/xmertl/xtratum/xmtrace/xmtrace_shm.ko /home/wuxy/xmertl/xtratum/xmtrace/xmtrace_shm.o /home/wuxy/xmertl/xtratum/xmtrace/xmtrace_shm.mod.o

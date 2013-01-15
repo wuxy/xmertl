@@ -1,0 +1,172 @@
+RTLinux Tracer version 0.2
+Written by Michael Barabanov (baraban@fsmlabs.com)
+Copyright (C) Finite State Machine Labs Inc., 1999, 2000
+Released under the terms of the GNU GPL Version 2.
+
+
+This program package allows tracing of various system and user-defined events
+(interrupts, taking of spin-locks, etc), in Real-Time Linux. It is useful for
+finding out how the system time is spent, where the delays are coming from,
+etc. 
+
+	REQUIREMENTS
+
+- RTLinux version 3.0 or later
+- modutils version 2.3.16 or higher
+- ksymoops 2.3.4 or higher
+
+
+
+	INTRODUCTION
+
+Real-time programs can be challenging to debug because traditional
+debugging techniques such as setting breakpoints and step-by-step execution
+are not always appropriate. This is mainly due to two reasons:
+
+- Some errors are in the timing of the system. Stopping the program changes
+  the timing, so the system can not be analyzed without modifying it's behavior.
+
+- If the real-time program controls certain hardware, suspending the program
+  for analysis may cause the hardware to malfunction or even break (think of
+  robots).
+
+
+The RTLinux Tracer provides a solution to these and some other problems.
+In fact, it is sometimes used to debug RTLinux itself!
+
+
+The tracer timestamps and logs the events of interest into a set of
+circular buffers that are flushed by a user-space daemon.
+The flushing is triggered from your rtlinux program when needed.
+It is possible thus to find out the sequence of events that lead to
+some particular situation. This is an extremely space-efficient approach.
+There is no need to produce 30MB log files when typically only
+only a small portion of all events (the latest ones) is of interest.
+
+A builtin set of events includes RTLinux interrupt handlers entry and exit,
+scheduler entry and exit, spin-lock acquiring and freeing, context switches,
+interrupts disabling and enabling. User-defined events are also allowed.
+It is possible to attach an arbitrary 32-bit value to each event record.
+The current value of instruction pointer is also logged with each event.
+
+Events are grouped into classes.  It is possible to select logging of events of
+any combination of different classes during runtime.
+
+
+
+	QUICK START
+
+0. Enable the CONFIG_RTL_TRACER option when running "make config".
+Recompile RTLinux.
+
+1. Install the base RTLinux modules (scripts/insrtl).
+Install the shared memory driver: insmod modules/mbuff.o
+
+2. Become root, cd tracer; make test
+
+3. The rt_process module here is a modified version of 
+examples/measurements/rt_process.c. All supported events are logged;
+the trace buffer is dumped when a new maximum timing error value is
+reached. This way it is possible to learn more about what caused a
+large scheduling delay (by examining the sequence of events preceding
+the delay).
+
+4. Sample output:
+
+
+P0    410         rtl_spin_lock  0xc400a1e4   <c4008562>
+CPU  relative     event name     event data   instruction pointer
+     timestamp
+
+The relative timestamp is measured from the previous event. Due to this
+the first timestamp will be incorrect and should be neglected. The units 
+are nanoseconds. 
+Some possible event names and the meanings of event data:
+
+Event name		Event data
+
+rtl_no_interrupts	saved flags		
+intercept entry		the irq vector
+user			user-defined (rt_process.c: the max RT-thread delay)
+rtl_spin_lock		spinlock address
+
+The full list of events can be found in include/rtl_tracer.h.
+Note. intercept and local_intercept events correspond to global and
+local CPU interrupts respectively.
+
+For the intercept events, the EIP points to the place where the interrupt
+occurred. For all other events, EIP means the place in the program the routine
+being traced was called from.
+
+5. You can use the provided symresolve program on the trace file
+to translate the EIP values to symbolic names. Usage: symresolve TRACEFILE.
+symresolve uses ksymoops(8) to resolve addresses.
+
+NOTE. Debugging support has to be enabled in RTLinux for symresolve to work.
+
+6. You need to load the shared memmory driver mbuff.o (located in modules/) for
+the tracer to work.
+
+
+	PROGRAMMING API
+
+extern void rtl_trace(int event_id, long event_data, void *eip);
+	This is the main logging function. It does nothing if the rtl_tracer.o module
+	is not loaded. The list of supported events can be found in
+	include/rtl_tracer.h. You can also create your own events. 
+	
+extern void rtl_trace2(int event_id, long event_data);
+	This function is the same as rtl_trace, except that it logs the current
+	instruction pointer.
+
+extern unsigned rtl_trace_settracemask (unsigned mask);
+	Set logging mask (OR'ed event classes). A list of existing event classes
+	can be found in rtl_tracer.h. You can also define your own event classes.
+	This function returns the old trace mask value.
+
+	Example: to only log scheduling and user events, you can use
+	unsigned oldmask = rtl_trace_settracemask (RTL_TRACE_CLASS_SCHEDULER | RTL_TRACE_CLASS_USER);
+
+	By default all events are allowed (the default mask is set to 0xffffffff).
+
+
+extern int rtl_trace_seteventclass (int event, unsigned classmask);
+	Set the class of the event.
+
+
+To switch to another trace buffer, and let the user-space daemon process
+the current buffer, use the special RTL_TRACE_FINALIZE event with rtl_trace or
+rtl_trace2. "event_data" and "eip" parameters are ignored in this case.
+
+By default, the RTLinux Tracer uses 20 buffers 500 records each. This
+means the tracer captures 500 events preceding the finalization point 
+of a trace. You can change these limits by editing rtl_tracer.h file
+(RTL_TNBUFFERS, RTL_TNRECORDS).
+
+
+
+	CREATING YOUR OWN EVENTS
+
+1. Allocate an event number, for example
+#define RTL_TRACE_MY_EVENT (RTL_TRACE_USER + 1)
+The total number of events should be less then RTL_TRACE_MAX_EVENTS.
+
+2. Set the event class:
+rtl_trace_seteventclass (RTL_TRACE_CLASS_USER);
+
+3. Set the event name
+rtl_trace_seteventname (RTL_TRACE_MY_EVENT, "my event");
+
+4. To log your event, you can use
+rtl_trace2 (RTL_TRACE_MY_EVENT, data);
+
+
+
+---------------------------------------------------------------
+Please direct all comments and suggestions to
+Michael Barabanov <baraban@fsmlabs.com>
+
+
+September 16, 1999.
+Updated for RTLinux 3.0 on August 15, 2000.
+

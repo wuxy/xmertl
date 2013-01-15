@@ -1,0 +1,6 @@
+# force 32 bits compilation
+HOSTCC          = gcc -m32
+HOSTCXX         = g++
+HOSTCFLAGS      = -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer
+HOSTCXXFLAGS    = -O2
+

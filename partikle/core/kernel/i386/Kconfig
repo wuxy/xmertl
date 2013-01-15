@@ -1,0 +1,20 @@
+#
+# Plug and Play configuration
+#
+
+menu "CPU features"
+config X86_PAGING
+	bool "Enable paging"
+	help
+		When using paging, PaRTiKle isolates the kernel code from
+		the application code easing the detection of programming bugs.
+		The main drawback of this option is the incrementation of the
+		size of the kernel in several Kbytes.
+
+config FP_SUPPORT
+	bool "Floating Point Support"
+	default n
+	help
+		Enable PaRTiKLe to use the FPU
+
+endmenu

@@ -1,0 +1,150 @@
+1. Required software
+====================
+
+- (MANDATORY)A 2.6.x Linux Kernel. XtratuM has been successfully
+tested using the 2.6.17.4 version, however it could also work with
+later versions. The Linux kernel can be download from:
+http://www.kernel.org.
+
+This installation instructions has been tested on a system with the
+following configuration:
+Gnu C                  3.4.6 or 4.1.2
+Gnu make               3.81beta4
+binutils               2.16.91
+util-linux             2.12r
+module-init-tools      3.2.2
+Linux C Library        2.3.6
+Dynamic linker (ldd)   2.3.6
+
+
+
+2. Installation notes
+=====================
+
+1) Untar the Linux kernel sources and the XtratuM source.
+
+   $ tar -xjvf [linux_sources].tbz2
+   $ tar -xjvf [XtratuM_sources].tbz2
+
+2) Patch the Linux kernel with the XtratuM patch (file
+   xtratum/patches/xtratum_linux_2.6.17.4.patch)
+
+   $ cd [linux_sources_directory]
+
+   $ patch -p1 < [XtratuM location]/xtratum/patches/xtratum_linux_2.6.17.4.patch
+
+3) Compile the Linux kernel
+
+3.1) Configure the Linux kernel
+
+
+   In the vanila Linux kernel, all the options are selected (in the
+   kernel as a module) by default. Compiling this kernel takes a lot
+   of time because a lot of unnecessary files are compiled and
+   installed. It is wise to unselect most of the drivers (which are
+   quite unlikely to appear on embedded systems). In order to simplify
+   the task of configuring your Linux, we provide a file [XtratuM
+   location]/patches/minimal.Linux.config which is a configuration
+   file with almost no drivers enabled. You can copy that file to the
+   [Linux location]/.config and then call make menuconfig.
+
+   $ make menuconfig (or xconfig or config)
+
+   Here, it is mandatory enabling:
+   -> General setup -> XtratuM support
+
+   And selecting:
+
+   -> Processor type and features -> Symmetric multi-processing support [OFF]
+   -> Processor type and features -> Preemption Model (No Forced Preemption (Server)) 
+   -> Processor type and features -> Local APIC support on uniprocessors [OFF]
+   -> Processor type and features -> High Memory Support (off)
+   -> Processor type and features -> Memory model (Flat Memory) 
+   -> Processor type and features -> Use register arguments [OFF]   
+   -> General setup -> Power Management support [OFF] 
+   -> General setup -> ACPI [OFF all options]
+   -> General setup -> CPU Frequency scaling [OFF all options]
+
+3.2) Compile it
+
+   $ make && make modules_install
+
+3.3) Install the kernel image (This step is highly dependent of the
+boot manager. Here we explain how to configure the GRUB boot loader)
+
+3.3.1) Copy the kernel image (located at
+[linux_sources_directory]/arch/i386/boot/bzImage) to /boot
+
+   $ cp [linux_sources_directory]/arch/i386/boot/bzImage /boot/xmlinuz
+
+3.3.2) Instruct GRUB about this new image (editing /boot/grub/menu.lst)
+
+$ emacs /boot/grub/menu.lst
+
+and add next lines:
+
+-------------------------------------------------
+title           XMLinux
+root            (hd0,0)
+kernel          /boot/bzImage root=/dev/hda1 ro
+boot
+--------------------------------------------------
+
+We assume that the /boot directory is located in the /dev/hda1
+partition (being hd0 and hda1 your hard disk).
+
+3.3.3) Reboot the machine
+
+4) Compile XtratuM
+
+   $ cd [xtratum_sources_directory]
+
+4.1) Edit XtratuM configuration file (Config.mk) and set the path of
+     the linux sources to the LINUX_PATH variable.
+
+4.2) Compile XtratuM
+
+   $ make
+
+
+Now XtratuM is already installed and ready to be used.
+
+
+3. Example of use
+=================
+
+1) Insert the XtratuM modules
+
+$ cd [Directory where xtratum is installed]
+
+
+-> The first thing to do is to insert XtratuM
+
+$ insmod xm.ko
+
+2) Insert our test application (in this case the "trivial domain")
+
+-> Go to the application folder
+
+$ cd [Directory where xtratum is installed]/user_tools/examples/trivial_domain
+
+-> Compile the trivial domain
+
+$ make
+
+-> Insert the trivial domain (by using the loader.xm)
+
+$ ../../xmloader/loader.xm trivial.xmd
+
+The execution of this command will return an ID. This ID is must be
+used after to unload the domain.
+
+
+3) Check that is working properly
+
+This step can be done executing "cat /proc/xtratum" which will display
+information about the running domains.
+
+4) Unload the trivial domain (by using the unloader.xm)
+
+$ unloader.xm -id <DOMAIN_ID>

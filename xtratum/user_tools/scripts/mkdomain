@@ -1,0 +1,42 @@
+#! /bin/bash
+
+source `dirname $0`/Config.scr
+
+START_FILE=$USER_TOOLS_PATH/libxm/start.o
+LIBXM=$USER_TOOLS_PATH/libxm/libxm.a
+
+FORCEFLAG=0;
+
+if [ $# -lt 2 ] ; then
+    echo "Usage: `basename $0` -o <output> <file_1.o> [<file_2.o> ... ] " ;
+    exit 0 ;
+fi
+
+if [ $1 == "-o" ] ; then
+  shift 1;
+  FORCEFLAG=1;
+fi
+
+if [ $# -lt 2 ] ; then
+    echo "Usage: `basename $0` -o <output> <file_1.o> [<file_2.o> ... ] " ;
+    exit 0 ;
+fi
+
+OUTPUT=$1;
+shift 1;
+
+if [ $FORCEFLAG -eq 0 ] ; then
+    if [ -f $OUTPUT ] ; then
+	echo "$OUTPUT already exists";
+	echo "Do you want to overwrite $OUTPUT? [y|N]";
+	read -e ANSWER;
+	if [ "$ANSWER" != "y" ] ; then
+	    echo "exiting";
+	    exit 0 ;
+	fi;
+    fi;
+fi;
+
+echo "Building XM domain: $OUTPUT"
+
+$LD -o $OUTPUT $START_FILE $@ --start-group $LIBXM $LIBGCC --end-group

@@ -1,0 +1,158 @@
+\section{Examples}
+By far, I think you have understood what XM/eRTL is, how install XM/eRTL, the main components in XM/eRTL and how to usage those components or functions. In the section, two case studies will be showed. From the cases, hoping readers or learners can understand XM/eRTL more clearly. In the first example, the new domain will be built. It will show how to build the new domain, how to use the hypercalls offered by XtratuM, and how to operate (including compile, load, unload, etc.) the domain. The second example will show how to write a real-time thread based on resource offered by PaRTiKle.
+
+\subsection{Domain}
+Domain is the object running on XtratuM. Same as process is scheduled by Linux, domain is schedule by XtratuM. In XtratuM, domain can be an operating system, device driver server, an independent normal task. If it is an operating system, it could have all functions besides hardware timer and interrupt management. Let's see a simple domain program first.
+
+\begin{lstlisting}[language=c]
+#include <xm_syscalls.h>
+
+void timer_handler (int event, void *a) 
+{
+        write_scr ("In IRQ 0\n", 9);
+        /* unmask_event(0); */
+}
+
+int kmain(void)
+{
+        struct xmitimerval irqtime = {{0, 200000}, {0, 0}};
+	
+        install_event_handler (0, timer_handler);
+        set_timer(&irqtime, 0);
+        unmask_event(0);
+        enable_events_flag();
+
+        while(1) {
+                suspend_domain();
+        }
+
+        return 0;
+}
+\end{lstlisting}
+
+This is a very simple domain. The domain includes timer interrupt response handler. When timer is triggered in the system, the event will entry timer\_handler routine at last. 
+\\
+The domain comprises of three parts: head files, timer interrupt hander and domain main body. <xm\_syscalls.h> is the only header file for domain now. There are more than ten hypercalls and other routines in the header file. And they are what APIs you can use for you domain too. \\
+The timer\_handler() can be taken place by any other routine name, but the routine's parameters and return value you cannot changed. So the interrupt handler should be:
+\begin{verbatim}
+void your_irq_handler_name(int irq_number, void *point_to_handler_arguments);
+\end{verbatim}
+In the above timer\_handler() routine, one(Or two, another is commented) routine is called. write\_scr() routine is a hypercall defined in <xm\_syscalls.h>. It will output the string into console. "In IRQ 0" is the output string and 9 is the size. The output result can be get by dmesg command. The unmask\_event() routine is used to unmask the envent bit and enable the related event again. If you use the routine, the interrupt will be responsed all the time. But in my progamm, it responces once only.
+\\
+kmain() is the domain entry routine. There is no parameter for kmain() and the return value type is integer. The porpuses of the kmain routine are: 1) install a timer handler for the domain; 2) initilize the domain timer which will trigger the system timer in period; 3) suspend the domain and avoid the domain exit.  
+\begin{lstlisting}
+/* Define the period, 200000ns */
+struct xmitimerval irqtime = {{0, 200000}, {0, 0}};
+
+/* hypercall, install the timer handler for domain */        
+install_event_handler (0, timer_handler);
+/* hypercall, set the domain timer period value*/
+set_timer(&irqtime, 0);
+/* unmask the timer interrupt */
+unmask_event(0);
+/* enable the envents */
+enable_events_flag();
+
+/* avoiding the domain exit */
+while(1) {
+	
+	suspend_domain();
+}
+\end{lstlisting}
+
+When you understand the domain source code. You should know how to write the Makefile for compiling the domain.
+
+\begin{verbatim}
+xmertl:~$ cat Makefile 
+SOURCES = $(wildcard *.c)
+NAMES = $(basename $(SOURCES))
+TARGETS = $(addsuffix .xmd,$(NAMES))
+#change to you user_tools path.
+USER_TOOL_PATH=/home/xmertl/xtratum/user_tools
+MKDOMAIN=${USER_TOOL_PATH}/scripts/mkdomain
+
+all: $(TARGETS)
+
+include ${USER_TOOL_PATH}/Rules.mk
+
+${USER_TOOL_PATH}/Rules.mk:
+        make -C ${USER_TOOL_PATH}/ Rules.mk
+%.xmd: %.o
+        $(MKDOMAIN) -o $@  $<
+%o: %c
+        $(CC) $(CFLAGS) -c -o $@  $<
+clean:
+        $(RM) -f *~ *.o *.xmd
+\end{verbatim}
+
+One value should be changed based on your enviroment in Makefile: USER\_TOOL\_PATH. It should specify the user\_tools directory offered by XtratuM. Those tools are used to compile the souce code, link the library, load and unload the domain. 
+\\
+When the Makefile is written, you can compile the source code, load the domain, check the result and unload the domain.
+\begin{verbatim}
+# make
+# /home/xmertl/xtratum/user_tools/loader.xm timer.xmd
+>> Loading the domain "timer.xmd (timer.xmd)" ... Ok (Id: 2)
+# cat /proc/xtratum
+(2) timer.xmd:
+Priority: 1
+Intercepted events: 0x10
+Masked events: 0xffffffef
+Pending events: 0x0
+Events' flag is enabled
+Current state: SUSPENDED
+Domain's state word: 0x1
+(0) Linux:
+Priority: 1023 (MIN. PRIORITY)
+Intercepted events: 0xffff
+Masked events: 0xffff0000
+Pending events: 0x0
+Events' flag is enabled
+Current state: ACTIVE
+Domain's state word: 0x0
+# dmesg
+In IRQ 0
+# /home/xmertl/xtratum/user_tools/unloader.xm -id 2
+>> Unloading the domain "(2)" ... OK
+\end{verbatim}
+By far, you have known how to write a simple domain for XtratuM. If you want to know much on it, you should study 1) hypercalls offered by XtratuM (see Appendix A. List of Hypercalls), 2) tools offered in user\_tools (see section 2.4. Tools Usage).
+
+\subsection{Thread}
+
+Thread mechnism is supported by PaRTiKle system which is a special domain running on XtratuM. You can learn more on PaRTiKle from section 2.3.1 About PaRTiKle. PaRTiKle is POSIX compatible, and many APIs are offered by PaRTiKle. Let's see the bellow example.
+
+\begin{lstlisting} 
+xmertl:~$ cat thread.c
+#include <stdio.h>
+#include <time.h>
+#include <pthread.h>
+
+static pthread_t thread;
+
+void *func(void *args)
+{
+        struct timespec sleeptime = {2, 0};
+
+        nanosleep (&sleeptime, 0);
+
+        return (void *)23;
+}
+
+int main (int argc, char **argv) 
+{
+        int ret_v;
+
+        pthread_create (&thread, 0, func, 0);
+        pthread_join (thread, (void *) &ret_v);
+        printf ("Returned value: %d\n", ret_v);
+        
+        return 0;
+}
+\end{lstlisting}
+
+The main() routine is PaRTiKle domain entry routine which same as the Kmain() routine in the above section. When the system enter the main() routine, PaRTiKle domain start running but without thread now. The first thread is created when pthread\_create() routine is called. From here, two tasks will be secheduled seperately: the main process from pthread\_create to pthread\_join and thread body func() routine. The thread will sleep two seconds and then exit. The main process will wait thread by pthread\_join() rountine. When thread exit, the main process will catch the return value from thread and output the value. 
+\\
+The thread is same as any POSIX thread. So you can call POSIX  API to handle threads. Signal, condition, timer, mutex are supported by PaRTiKle for thread. So you can read POSIX manual to learn more how to write thread programms for PaRTiKle. But you should remember the difference of running enviroment between XtratuM thread and Linux thread:
+\begin{verbatim}
+XtratuM                    Linux
+Domain {thread1, ...}      Process {thread1, ...}
+\end{verbatim}

@@ -1,0 +1,237 @@
+/*
+ * $FILE:  
+ *
+ * $Description:
+ *
+ * $VERSION: 1.0
+ *
+ * Author: Bai Shuwei <baishuwi@{dslab.lzu.edu.cn, weslab.com}>
+ *
+ * $LICENSE:  
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ */
+
+
+#include <config.h>
+#include <fs.h>
+#include <errno.h>
+#include <string.h>
+#include <ctype.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+#include <arch/xm_syscalls.h>
+
+#include "shm.h"
+
+static pshm_dev_t prtk_shm;
+
+static int prtk_shm_ioctl(int fd, unsigned int cmd, unsigned long arg)
+{
+	struct pshm_t *shm;
+	unsigned long dev;
+
+	int minor;
+
+	minor = MINOR(fd);
+
+	if(minor < 0 || minor >= PRTK_SHM_COUNT) {
+		SET_ERRNO(EINVAL);
+		return 0;
+	}
+												        
+	shm = &prtk_shm.pshm[minor];
+
+	dev = ((XM_SHM_DEV << 16) & 0xFFFF0000) | (minor & 0x0000FFFF);
+														        
+	switch(cmd) {
+		case PRTK_SHM_TRUNCATE:
+			xm_dev_ctl(dev, XM_SHM_TRUNCATE, (void *)arg);
+			break;
+		case PRTK_SHM_VADDR:
+			xm_dev_ctl(dev, XM_SHM_VADDR, (void *)arg);
+			break;
+		default:
+			break;
+	}
+
+	return 0;
+}
+
+static long prtk_shm_read(int fd, void *dest, long size, long long offset)
+{
+	printf("READ UNPERMISSION FOR PRTK SHM DEVICE");
+
+	return 0;
+}
+
+static long prtk_shm_write(int fd, const void *src, long size, long long offset)
+{
+	printf("WRITE UNPERMISSION FOR PRTK SHM DEVICE");
+
+	return 0;
+}
+
+static int prtk_shm_mmap(int fd, void  *start, int length,
+	int prot, int flags, int offset, char **result)
+{
+ 	void * nstart;
+	int minor = MINOR(fd);
+	unsigned long dev = ((XM_SHM_DEV << 16) & 0xFFFF0000) | (minor & 0x0000FFFF);
+	int err = 0;
+
+	err = xm_dev_ctl(dev, PRTK_SHM_TRUNCATE, (void *)length);
+
+	if (err) {
+		SET_ERRNO(EINVAL);
+		return -1;
+	}
+
+	if(NULL == start) {
+		start = (void *)DEFAULT_SHM_ADDR;
+	} 
+
+	/* alignement */
+	if((unsigned long)start & 0xFFF) nstart = (void *)((unsigned long)start & (~0xFFF));
+	else nstart = start;
+	
+	err = xm_dev_ctl(dev, XM_SHM_MAP, start);
+	if (err) {
+		SET_ERRNO(EINVAL);
+		return -1;
+	}
+
+	*result = start;
+
+	prtk_shm.pshm[minor].shm_addr = (unsigned long)start;
+
+	return 0;
+}
+
+static int pshm_minor_to_name(int minor, char *name)
+{
+	int index = minor;
+	int i = 0;
+
+	while(name[i]) { i++;}
+
+	if (index == 0) name[i] = '0';
+	else {
+		while(index) {
+			name[i] = (index % 10) + '0';
+			index   = index / 10;
+			i ++;
+		}
+	}
+
+	return 0;
+}
+
+
+static int prtk_shm_open(char *name, int mode)
+{
+	int  nml = 9; /*strlen("/dev/shm/");*/
+	char *mn = name + nml;
+	char *pm;
+	int  minor = -1;
+	int  fd = 0;
+	char nname[10] = "shm";
+
+	if(0 == (*mn)) {
+		SET_ERRNO(ENOENT);
+		return -1;
+	}
+
+    if(isdigit(*mn)) {
+		minor = strtol(mn, &pm, 10);
+		
+		if(minor < 0 || minor >= PRTK_SHM_COUNT) {
+			SET_ERRNO(EINVAL);
+			return -1;
+		}
+	} else if(strncmp(mn, "ctl", 3) == 0) {
+		minor = PRTK_SHM_COUNT; 
+	}
+
+	if(minor < 0 || minor > PRTK_SHM_COUNT) {
+		SET_ERRNO(EINVAL);  
+		return -1;
+	}
+
+	if ((fd = newfd()) >= MAX_FILES) {
+		freefd(fd);
+		SET_ERRNO(ENOMEM);
+		return -1; 
+	}
+
+	files[fd].qid.path = minor;
+
+	files[fd].type = devno('s');
+
+	/* control file */
+	if (minor == PRTK_SHM_COUNT) {
+		return fd;
+	}
+
+	pshm_minor_to_name(minor, nname);
+
+	minor = xm_shm_open(nname, 0, 0);
+
+	if (!prtk_shm.pshm[minor].shm_users++) {
+		prtk_shm.pshm[minor].shm_flags |= 0x1000000;	
+	}
+	
+	prtk_shm.pshm[minor].shm_flags |= mode;
+
+	return fd;
+	
+}
+
+
+static void prtk_shm_close(int fd)
+{
+	int minor = MINOR(fd);
+	char name[10] = "shm";
+	unsigned long dev = 0;
+    int err = 0;
+
+
+	if(minor >= 0 && minor < PRTK_SHM_COUNT) {
+		dev = ((XM_SHM_DEV << 16) & 0xFFFF0000) | (minor & 0x0000FFFF);
+		err = xm_dev_ctl(dev, XM_SHM_UNMAP, (void *)prtk_shm.pshm[minor].shm_addr);
+		pshm_minor_to_name(minor, name);
+		xm_shm_unlink(name);
+	}
+}
+
+static int prtk_shm_init(void)
+{
+	return 0;
+}
+
+Dev shmdevtab = {
+	dc: 's',
+	name:  PRTK_SHM_NAME,
+	init:  prtk_shm_init,
+
+	open:  prtk_shm_open,
+	read:  prtk_shm_read,
+	write: prtk_shm_write,
+	close: prtk_shm_close,
+	ioctl: prtk_shm_ioctl,
+	mmap:  prtk_shm_mmap,
+};
+
+

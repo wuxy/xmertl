@@ -1,0 +1,74 @@
+# Plug and Play configuration
+mainmenu "PaRTiKle Configuration Tool"
+
+choice
+	prompt "Architecture"
+	default ARCH_X86
+config ARCH_X86
+	bool "x86 Stand Alone system"
+	help
+		Choose this to run PaRTiKle on a standard PC or compatible.
+config ARCH_ARM
+	bool "ARM Stand Alone system"
+	help
+		Choose this to run PaRTiKle on the qemu-system-arm which emulates a IntegratorCP board.
+config ARCH_LINUX
+	bool "Regular Linux process"
+	help
+		Choose this to run PaRTiKle as a standard Linux process.
+config ARCH_XTRATUM
+	bool "XtratuM domain"
+	help
+		Choose this to run PaRTiKle over the HAL provided by XtratuM.
+config ARCH_LPC
+	bool "LPC (arm7) Stand Alone system"
+	help
+		Choose this to run PaRTiKle on a LPC2000 based system.
+endchoice
+
+menu "Devices"
+source "core/kernel/port/Kconfig.drv"
+
+# architecture specific devices
+if ARCH_X86
+source "core/kernel/i386/Kconfig.drv"
+endif
+
+if ARCH_ARM
+source "core/kernel/arm/Kconfig.drv"
+endif
+
+if ARCH_LINUX
+source "core/kernel/linux/Kconfig.drv"
+endif
+
+if ARCH_XTRATUM
+source "core/kernel/xm_i386/Kconfig.drv"
+endif
+endmenu
+
+# portable section
+source "core/kernel/port/Kconfig"
+
+menu "Architecture specific"
+
+# architecture specific devices
+if ARCH_X86
+source "core/kernel/i386/Kconfig"
+endif
+
+if ARCH_ARM
+source "core/kernel/arm/Kconfig"
+endif
+
+if ARCH_LINUX
+source "core/kernel/linux/Kconfig"
+endif
+
+if ARCH_XTRATUM
+source "core/kernel/xm_i386/Kconfig"
+endif
+endmenu
+
+# common options
+source "core/Kconfig"

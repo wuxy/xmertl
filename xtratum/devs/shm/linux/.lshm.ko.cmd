@@ -1,0 +1,1 @@
+cmd_/home/wuxy/xmertl/xtratum/devs/shm/linux/lshm.ko := ld -m elf_i386 -m elf_i386 -r -o /home/wuxy/xmertl/xtratum/devs/shm/linux/lshm.ko /home/wuxy/xmertl/xtratum/devs/shm/linux/lshm.o /home/wuxy/xmertl/xtratum/devs/shm/linux/lshm.mod.o

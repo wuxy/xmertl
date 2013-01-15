@@ -1,0 +1,145 @@
+How to use Fifos in XtratuM
+Author: Salva Peiró.
+
+INTRODUCTION
+============
+
+XtratuM fifos' have been implemented as a inter-domain communication
+mechanism. That is, by using them, several domains can establish a
+communication stream.
+
+INSTALLATION AND CONFIGURATION
+=============================
+
+Currently Fifos are not directly supported by the XtratuM core but as
+a patch. So, to use them, the first step is applying this patch, which
+is located under the XtratuM project tree [0] at
+patches/xtratum-1.0-fifo.patch:
+
+$ cd /usr/src/xtratum
+$ patch -p1 < patches/xtratum-1.0-fifo.patch
+
+Once the XtratuM has been patched, it has to be recompiled:
+
+$ make
+
+The execution of the command "make" must create a set of new Linux
+device files "/dev/rtf{0-16}". Check it executing:
+
+$ ls /dev/rtf*
+/dev/rtf0   /dev/rtf12  /dev/rtf2  /dev/rtf6
+/dev/rtf1   /dev/rtf13  /dev/rtf3  /dev/rtf7
+/dev/rtf10  /dev/rtf14  /dev/rtf4  /dev/rtf8
+/dev/rtf11  /dev/rtf15  /dev/rtf5  /dev/rtf9
+
+If the devices haven't been created, do it by hand executing the
+script "lfifo/install-fifo". NOTE: ROOT rights are required to perform
+correctly this operation.
+
+# cd /usr/src/xtratum
+# lfifo/install-fifo -i
+Linux fifo install (/dev/rtf): success
+#
+
+After this use the xmctl script to load the fifo's aware xm.ko module:
+# xmctl start
+insmod /usr/src/xtratum/xm.ko
+insmod /usr/src/xtratum/lfifo/lfifo.ko
+#
+
+USAGE
+=====
+
+Two XtratuM fifo usages can be distinguished depending on 
+where the application accessing the fifos is executed:
+	- from a PaRTiKle application
+	- from a Linux application
+
+From a PaRTiKle application
+---------------------------
+Let's start explaining it's usage from the PaRTiKle application
+point of view.
+
+A PaRTiKle application which wants to send data to another domain
+does so by using the XtratuM fifo device, this device has to be enabled
+during the PaRTiKle's configuration stage by choosing XTratuM fifos
+support on the "Devices" submenu of the configuration utility presented by:
+
+$ cd /usr/src/partikle
+$ make menuconfig
+
+Once this is done the application running PaRTiKle can access fifo
+through the /dev/rtf{0-16} files of the PaRTiKle filesystem,
+the fifos are managed by the PaRTiKle fifo device (devrtf.c).
+
+We give an specific example to continue the usage description,
+we will asume that /dev/rtf0 is used to communicate both ends:
+with Linux running on the Root domain and PaRTikle running on domain 1.
+
+	domain 0 (Linux)		domain 1 (PaRTiKle)
+	read	/dev/rtf0	<-	write /dev/rtf0
+
+As it can be seen in the above layout: a read of /dev/rtf0 performed in Linux
+returns the data written on /dev/rtf0 by PaRTiKle.
+
+To perform writes from the PaRTiKle domain we can use the fifo.prtk example
+which is located at user/examples/c_examples/fifo.c.
+To compile type the following:
+
+$ cd  users/examples/c_examples/
+$ make fifo.prtk
+
+And execute the fifo.prtk domain, with
+
+# xmctl /usr/src/partikle/user/examples/c_examples/fifo.prtk
+>> Loading the domain "fifo.prtk (fifo.prtk)" ... Ok (Id: 1)
+#
+
+From a Linux application
+------------------------
+
+Now we continue explaining the usage from the linux application
+point of view.
+
+In this case a Linux application which reads the data sent from
+a PaRTiKle domain
+It's important to know that the implemented fifo's, are non blocking:
+so a read/write on a empty/full fifo will return inmediatelly.
+
+This implies that the standard commands that terminate after reading EOF
+like the "cat" command can't be used to read data from the fifo devices
+since at start the fifo will be empty and the programs will finish.
+
+As an example we provice a simple cat utility at lfifo/cat.c
+which can be used to start a reader on the linux fifo devices,
+which will show the data written by the fifo.prtk domain:
+
+$ cd /usr/src/xtratum/
+$ lfifo/cat /dev/rtf0
+I am in the partikle
+I am in the partikle
+I am in the partikle
+I am in the partikle
+I am in the partikle
+
+To finish this example we can stop the linux reader
+unload the domain and stop the XtratuM nanokernel,
+with the following commands:
+
+# xmctl unload fifo.prtk
+>> Unloading the domain "(1)" ... OK
+# xmctl stop
+rmmod lfifo
+rmmod xm
+
+References
+==========
+
+[0] XtratuM nanokernel,
+    http://www.xtratum.org/
+
+[2] PaRTiKle RTOS,
+    http://www.e-rtl.org/partikle/
+
+[1] XM-FIFO: Interdomain Communication for XtratuM,
+    http://www.realtimelinuxfoundation.org/events/rtlws-2007/paper_6997.html

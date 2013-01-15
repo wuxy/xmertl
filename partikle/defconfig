@@ -1,0 +1,42 @@
+#
+# Automatically generated make config: don't edit
+# PaRTiKlE: 0.2.0
+# Wed Jul 22 09:31:30 2009
+#
+# CONFIG_ARCH_X86 is not set
+# CONFIG_ARCH_ARM is not set
+# CONFIG_ARCH_LINUX is not set
+CONFIG_ARCH_XTRATUM=y
+# CONFIG_ARCH_LPC is not set
+
+#
+# Devices
+#
+# CONFIG_PORT_DEVUART is not set
+CONFIG_XTRATUM_FIFO=y
+
+#
+# Architecture specific
+#
+# CONFIG_FP_SUPPORT is not set
+
+#
+# Core Options
+#
+CONFIG_KDYNAMIC_MEMORY=2097152
+CONFIG_UDYNAMIC_MEMORY=1047552
+# CONFIG_VERBOSE_COMPILE is not set
+# CONFIG_DEBUGGING is not set
+
+#
+# Ulibc Options
+#
+CONFIG_ULIBC_ERRSTR=y
+
+#
+# Language Support
+#
+# CONFIG_ADA_SUPPORT is not set
+CONFIG_GNAT_PATH="/opt/gnat2005"
+# CONFIG_CXX_SUPPORT is not set
+# CONFIG_JAVA_SUPPORT is not set

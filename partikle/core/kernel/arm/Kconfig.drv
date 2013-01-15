@@ -1,0 +1,15 @@
+menu "Drivers"
+
+config DRV_PL011
+	bool "UART PL011"
+	default y if BOARD_INTEGRATORCP 
+	help
+
+config DRV_ICP_PIC
+	def_bool y if BOARD_INTEGRATORCP
+
+config DRV_ICP_PIT
+        def_bool y if BOARD_INTEGRATORCP
+
+endmenu
+

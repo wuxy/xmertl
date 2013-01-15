@@ -1,0 +1,37 @@
+Steps to run posixtestsuite for Partikle:
+
+1) Download a copy from posixtesuite.
+2) Extract it under the current directory.
+3) Apply the patch provided "posixtestsuite-partikle.patch" which 
+   contains a clean copy of the Posix Test Suite with minor changes needed 
+   to compile and test Partikle.
+
+So far, only the Linux_i386 target has been tested.
+
+Note that Partikle implements a minimal POSIX thred system. Therefore,
+system calls for regular (heavy) processes may not work or even
+exist at all.
+
+To test the pthread_mutex_timedlock's conformance with the standard, run:
+
+$ export POSIX_TARGET=conformance/interfaces/pthread_mutex_timedlock/
+$ make
+
+The result should be something like:
+conformance/interfaces/pthread_mutex_timedlock/1-1: build: PASS
+conformance/interfaces/pthread_mutex_timedlock/1-1: link: PASS
+conformance/interfaces/pthread_mutex_timedlock/2-1: build: PASS
+conformance/interfaces/pthread_mutex_timedlock/2-1: link: PASS
+conformance/interfaces/pthread_mutex_timedlock/4-1: build: PASS
+conformance/interfaces/pthread_mutex_timedlock/4-1: link: PASS
+conformance/interfaces/pthread_mutex_timedlock/5-1: build: PASS
+conformance/interfaces/pthread_mutex_timedlock/5-1: link: PASS
+conformance/interfaces/pthread_mutex_timedlock/5-2: build: PASS
+conformance/interfaces/pthread_mutex_timedlock/5-2: link: PASS
+conformance/interfaces/pthread_mutex_timedlock/5-3: build: PASS
+conformance/interfaces/pthread_mutex_timedlock/5-3: link: PASS
+
+Building timeout helper files
+
+
+Good work Miguel!

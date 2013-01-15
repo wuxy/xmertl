@@ -1,0 +1,31 @@
+Changelog
+=========
+
+1.0 (Nov 16 2006) Miguel Masmano Tello
+	Code rewritten from scratch and ported to Linux 2.6. This
+ 	XtratuM version does not work with previos (2.4.x) Linux
+ 	versions. New features:
+	* XtratuM domains has to be loadded with its own loader
+	(isnmod can not be used anymore).
+	* Domains are executed in a protected memory space.
+	* Works on 2.6
+	
+
+0.2
+	Optimised version of the previous release, reprogrammed the "daisy
+	channel" protocol, XtratuM API updated, fixed some importants bugs,
+	the virtual timers have been completely reprogrammed, and Local APIC
+	support has been added in the x86 architecture. Besides a graphical
+	configuration tool has been implemented (the code has been taken from
+	the Linux configuration tool).
+
+0.1
+	In this experimental version a lot of final features have been added,
+	examples of these features are: User level domains, virtual timers,
+	Frame Buffer support, and so on.
+	However this version has not been optimised enough.
+
+0.01
+
+	First XtratuM version, this is a proof-of-concept version.
+	This version only implements simple supervisor domains with events.

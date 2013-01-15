@@ -1,0 +1,16 @@
+TODO                                            Status
+
+Integrating FIFO                                 DONE
+Integrating UART                                 DONE
+Integrating SHM                                  DONE
+Integrating XM-Trace
+PORTING PaRTiKle to XM-UART
+Writing the AUTO TESTING suites
+Writing the xm_sig_*  (signal)
+writing the xm_msg_*  (message queue)
+INSTALL document                                 doing
+xm_shm document
+xm_fifo  document
+xm_syscall document                              DONE          
+partikle device document                         doing
+

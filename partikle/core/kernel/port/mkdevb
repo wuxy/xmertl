@@ -1,0 +1,54 @@
+
+# This file is a slight modification of Inferno® mkdevc
+
+$AWK '
+BEGIN {
+	if(ARGC < 1)
+		exit "usage"
+	conf = ENVIRON["CONF"];
+}
+$1 == "dev" {
+	for (i=2; i <= NF; i++){
+		fname = $i;
+		sub(/\.o/, "", fname);
+		if (match($i, /^dev.+/)){
+			sub(/^dev/, "", fname);
+			dev[ndev++] = fname;
+		}
+	}	
+}
+$1 == "link" {
+	for (i=2; i <= NF; i++){
+		fname = $i;
+		sub(/\.o/, "", fname);
+		link[nlink++] = fname;
+	}
+}
+END {
+	printf "#include \"dev.h\"\n"
+	printf "#include \"%s.root.h\"\n", conf;
+
+	nildev = 8;
+	printf "ulong ndevs = %s;\n\n", ndev+nildev
+	for(i = 0; i < ndev; i++)
+		printf "extern Dev %sdevtab;\n", dev[i];
+	printf "Dev* devtab[]={\n"
+	for(i = 0; i < ndev; i++)
+		printf "\t&%sdevtab,\n", dev[i];
+	for(i = 0; i < nildev; i++)
+		printf("\tNULL,\n");
+	printf "\tNULL,\n};\n\n";
+
+	for(i = 0; i < nlink; i++)
+		printf "extern void %slink(void);\n", link[i];
+
+	printf "void links(void){\n";
+	for(i = 0; i < nlink; i++)
+		printf "\t%slink();\n", link[i];
+	printf "}\n\n";
+
+	printf "unsigned long kerndate = KERNDATE;\n";
+
+	exit
+}
+' $*

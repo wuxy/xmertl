@@ -1,0 +1,42 @@
+#!/bin/bash
+# gcc-wrapper for PaRTiKLe compilation
+
+prtkdir=$(dirname $(which $0))
+if test -r $prtkdir/Config.scr; then
+	source $prtkdir/Config.scr
+else
+	echo $(basename $0) error: $prtkdir/Config.scr not found
+	exit
+fi
+
+progname=$(basename $0)
+usage (){
+	echo usage: $progname '[options] file...'
+}
+
+# parse options
+args=`getopt -n $progname -o hcSEMo:I:O: -- "$@"`
+if test $? != 0; then
+	usage; exit 1
+fi
+
+dontlink=
+for i in $(eval echo "$args" | sed 's/ -- / /')
+do
+	case "$i" in
+	-h) shift; usage; exit 0;;
+	-c|-S|-E|-M) dontlink=1;;
+	esac
+done
+
+if ! test -n "$dontlink"; then
+    CFLAGS="$CFLAGS -Wl,-r"
+fi
+
+# note: $CFLAGS is taken from Config.scr and 
+# already includes all the options required by
+# PaRTiKle and the underlying arch dependent flags
+
+# echo '#' exec gcc "$@" $CFLAGS
+exec $CC "$@" $CFLAGS
+

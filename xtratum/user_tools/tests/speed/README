@@ -1,0 +1,13 @@
+XtratuM serial driver speed testing
+
+The testing platform consists of two parts: server and client. The server write the data into the virtual serial device with the package size is 1024Bs. And the client read data from the virtual serial device. When the virtual serial is empty, the domain will go to sleep, and the period is 200000ns. (I try to change the client period value, and the speed doesn't change). 
+
+Baud    	Avg(b/s)	Max(b/s)	Min(b/s)
+115200 		77410 		77435 		77331
+19200  		14886 		14887 		14884
+38400  		29029 		29032  		29028
+57600  		38705 		38711 		38696
+9600  		7577  		7577 		7576
+
+
+

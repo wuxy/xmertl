@@ -1,0 +1,24 @@
+# toolchain configuration
+TC_PATH=/usr/bin/
+TC_PREF=
+TC_SUF=
+
+CC		= $(TC_PATH)$(TC_PREF)gcc$(TC_SUF)
+LD		= $(TC_PATH)$(TC_PREF)ld$(TC_SUF)
+NM		= $(TC_PATH)$(TC_PREF)nm$(TC_SUF)
+SIZE	= $(TC_PATH)$(TC_PREF)size$(TC_SUF)
+OBJCOPY	= $(TC_PATH)$(TC_PREF)objcopy$(TC_SUF)
+OBJDUMP	= $(TC_PATH)$(TC_PREF)objdump$(TC_SUF)
+
+CXX		= $(TC_PATH)$(TC_PREF)g++$(TC_SUF)
+GCJ		= $(TC_PATH)$(TC_PREF)gcj$(TC_SUF)
+GCJH	= $(TC_PATH)$(TC_PREF)gcjh$(TC_SUF)
+JAR		= $(TC_PATH)$(TC_PREF)jar$(TC_SUF)
+
+# select 32 bit target
+CC		:= $(CC) -m32
+LD		:= $(LD) -m elf_i386
+
+LIBGCC= `$(CC) -print-libgcc-file-name`
+
+# architecture dependent flags

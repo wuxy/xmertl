@@ -1,0 +1,10 @@
+
+PGNATMAKE=$(PRTK)/user/bin/pgnatmake
+
+%.prtk: %.adb
+	@echo $(shell basename $(PGNATMAKE)) $< -o $@
+	$(Q3)$(PGNATMAKE) $< -o $@ ${Q2}
+
+%.o: %.adb
+	@echo $(shell basename $(PGNATMAKE)) $< -c -o $@
+	$(Q3)$(PGNATMAKE) $< -c -o $@ ${Q2}

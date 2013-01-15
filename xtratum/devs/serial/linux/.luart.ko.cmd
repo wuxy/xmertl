@@ -1,0 +1,1 @@
+cmd_/home/wuxy/xmertl/xtratum/devs/serial/linux/luart.ko := ld -m elf_i386 -m elf_i386 -r -o /home/wuxy/xmertl/xtratum/devs/serial/linux/luart.ko /home/wuxy/xmertl/xtratum/devs/serial/linux/luart.o /home/wuxy/xmertl/xtratum/devs/serial/linux/luart.mod.o

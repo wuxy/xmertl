@@ -1,0 +1,88 @@
+#!/bin/bash
+# script to build a new kernel
+
+prtkdir=$(dirname $(which $0))
+if test -r $prtkdir/Config.scr; then
+	source $prtkdir/Config.scr
+else
+	echo $(basename $0) error: $prtkdir/Config.scr not found
+	exit
+fi
+
+userent=$PRTK/user/ulibc/libc/user_entry_point.o
+ulibc=$PRTK/user/ulibc/libc/ulibc.a
+libgcc_eh=$PRTK/user/lang_support/gcc/libgcc_eh.a
+libsupcxx=$PRTK/user/lang_support/libsupc++.a
+
+progname=$(basename $0)
+warn (){
+	echo $progname $*
+}
+usage (){
+	echo usage: $progname '-hvo <kernel> *.o -Llibdir -llibname'
+}
+self_checks(){
+	if test -z "$forceflag" && test -f $1; then
+		warn $out already exists
+		read -p "Do you want to overwrite $1? '[y|N]'" ans
+
+		if test "$ans" != "y"; then
+			warn exiting
+			exit 0
+		fi
+	fi
+
+	if test ! -f $PRTK/core/partikle_core.o; then
+		warn error: $PRTK/core/partikle_core.o not found.
+		warn error: Has PaRTiKle core been correctly compiled?
+		exit -1
+	fi
+}
+
+# parse options
+args=`getopt -n $progname -o hvol:L: -- "$@"`
+if test $? != 0; then
+	usage
+	exit 1
+fi
+
+out=
+obj=
+verbflag=
+forceflag=
+ldopts= #-trace
+set -- $(eval echo "$args")
+for i in $*
+do
+	case "$i" in
+	-h) shift; usage; exit 0;;
+	-v) shift; verbflag=1;;
+	-o) shift; forceflag=1;;
+	-L | -l) ldopts="$ldopts $i$2"; shift 2;;
+	--) shift;;
+	esac
+done
+
+# perform checks on arguments
+if test -z "$1"; then
+	usage
+	exit 1
+else
+	out=$1
+	obj=$(echo $1 | sed 's|\..\+||')_tmp.o
+	shift
+
+	self_checks $out
+	self_checks $obj
+fi
+
+# All the following commands have to run corrently in order to build the target.
+set -o errexit
+
+$LD -r -o $obj $@ $ldopts $userent --start-group $ulibc $libgcc_eh $LIBGCC --end-group 
+$OBJCOPY -G user_entry_point $obj
+$LD -L$PRTK/core -T$PRTK/core/kernel/$ARCH/partikle.lds -o $out $obj || { rm -f $obj; exit 1; }
+
+rm -f $obj
+
+#strip $out

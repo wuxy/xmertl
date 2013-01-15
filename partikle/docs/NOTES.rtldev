@@ -1,0 +1,107 @@
+Running PaRTiKle as a XtratuM Domain
+====================================
+written by Salva Peiro.
+
+This guide tells how to use this livecd, to develop RT applications with PaRTiKle and XtratuM.
+
+Introduction
+============
+
+Both PaRTiKle and XtratuM provided in the current installation are a
+copy from the subversion repository from
+	http://www.gii.upv.es/svn/rtos/trunk/
+which has the benefit that you can update your working copy at any time,
+just going to the project directory (under /usr/src) and issuing a:
+# cd /usr/src/xtratum
+# svn update
+# cd /usr/src/partikle
+# svn update
+
+Compiling PaRTiKle
+==================
+
+So the first step is to Compile PaRTiKle to be run on top of XtratuM
+for this run:
+# cd /usr/src/partikle
+# make menuconfig
+
+once the configuration menu appears choose the XtratuM Architecture: xm_i386
+save your changes and exit, and follow the provided instructions issuing:
+# make
+
+After this step is completed you'll be told to add the $PRTK environment variable
+and update $PATH to include PaRTiKle development tools, ignore this since it's been
+already done for you in the /root/.bash_profile.
+
+Once PaRTiKle is compiled, go to the examples directory and compile hello_world.c
+# cd user/examples/c_examples
+# make hello_world.prtk
+
+Once you have the hello_world.prtk XtratuM domain compiled proceed to the next section.
+
+Running XtratuM domains
+=======================
+
+For running XtratuM domains, the linux kernel has to be patched,
+which has already been done for you in the kernel you're running,
+moreover you've to insert a linux kernel module (LKM) to virtualize
+and take control of the interrupts.
+
+This is done inserting the  module located at /usr/src/xtratum/xm.ko,
+there's a convenience wrapper script called xmctl which already does this:
+# xmctl start
+
+After this you can check running
+# lsmod | grep xm
+
+that the XtratuM module has been loaded, also you can take a look
+at the /proc/xtratum file which reports XtratuM status information:
+# xmctl status
+
+you should see the root domain Linux (0) as an active domain,
+To run the example previously compiled issue
+# xmctl load ./hello_world.prtk
+
+to see the output of the example run
+# dmesg | tail
+
+You can check the status of the hello_world.prtk module by re-issuing a:
+# xmctl status
+
+once it's inactive you can unload it with:
+# xmctl unload ./helloworld.prtk
+
+Using XtratuM
+=============
+
+Even we provide a compiled XtratuM module xm.ko, you're free to compile your own
+which is interesting since you can benefit of using the latest changes from the repository
+# cd /usr/src/xtratum
+# svn update
+
+To do so you need prepare the linux kernel patched for XtratuM:
+# cd /usr/src/linux
+# make prepare scripts
+
+After this all the include files and needed tools to compile a kernel module are created,
+then it's just a matter of configuring and compiling XtratuM:
+# cd /usr/src/xtratum
+# cp Config.mk.example Config.mk
+# make
+
+After making sure you've unloaded the previous XtratuM module,
+you can load your new XtratuM module with
+# xmctl stop
+# xmctl start
+
+For further details
+===================
+You can check the following pointers,
+available at the current installation and also online:
+
+[1] the directories /usr/src/xtratum and /usr/src/partikle
+    contain INSTALL and README files and documentation.
+    
+[2] XtratuM's site: http://www.xtratum.org
+[3] PaRTiKle's site: http://www.e-rtl.org/partikle
+

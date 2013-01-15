@@ -1,0 +1,27 @@
+
+
+
+  PaRTiKle is an RTOS which provides both, the kernel and the
+supporting libraries. The kernel is licensed under the GPL v2 (GNU
+GENERAL PUBLIC LICENSE) with a explicit declaration of what is
+considered "derived work" (see below); and the libraries are licensed
+under the LGPL v2.1 (GNU LESSER GENERAL PUBLIC LICENSE). The files
+docs/GPL-2 and docs/LGPL-2.1 contain the full licenses.
+
+
+For code locate in  the "core" folder:
+  These code is released under the GPL-2 license with the following note:
+  The license does *not* cover user programs that use kernel services
+by normal system calls - this is merely considered normal use of the
+kernel, and does *not* fall under the heading of "derived work".  Also
+note that the GPL below is copyrighted by the Free Software
+Foundation, but the instance of code that it refers to (the PaRTiKle
+kernel) is copyrighted by:
+
+
+For code located in "user" folder:
+  This code is released under the LGPL-2.1 license.
+
+Alfons Crespo i Lorente
+Miguel Masmano Tello
+Ismael Ripoll Ripoll

@@ -1,0 +1,7 @@
+# files are taken relative to the PaRTiKle $PRTK
+root
+	/dev	/
+	/tmp	/
+	/usr	/
+	/COPYING
+	/usr/NOTES /NOTES

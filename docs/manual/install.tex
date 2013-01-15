@@ -1,0 +1,392 @@
+\section{Installation}
+The Linux operating system is the main operating environment for XM/eRTL, since it is used to boot the system and initialize the hardware. 
+After initialization is complete, XtratuM (which is the core of XM/eRTL) is loaded and takes control over the interrupt and timer management 
+permissions, and registers Linux as root domain. At last, PaRTiKle is loaded by Linux tools. These are the milestones of the XM/eRTL 
+installation process, which will be explained in a step-by-step description in detail in the following section. At the end of the section,
+the user-space tools used to manage XtratuM and its partitions are introduced.
+
+\subsection {Linux Installation}
+
+At the moment XMeRTL runs stable on Linux version 2.6.17.4, but other subsequent linux kernel verions are available, but still have to be
+concidered development verions. Therefore this document will focus on linux-2.6.17.4 
+\footnote{The Linux kernel can be download from: http://www.kernel.org.}.\\
+The operation system used in this manula is GNU/debian etch, but the process of configuring and building XM/eRTL should be very similar
+on other linux distributions.\\
+
+The first thing you need to be able to build a patched linux kernel and XM/eRTL, is a toolchain. For this purpose, debian offers us
+a dummy package, called \textit{build-essentials} which has dependcies to almost everything we will need during the build process. One
+additional package we will need is the ncurses library, used to display the kernel configuration menu. %is this correct?
+So let's install these two packages:
+\begin{verbatim}
+#apt-get install build-essential libncurses5
+\end{verbatim}
+
+$[NOTE:]$ If you use a newer distribution (e.g. debian lenny), you might need to install the package \textit{gcc-3.4} and
+add a \texttt{CC=gcc-3.4} to every make, since XtratuM requires gcc version 3.4.6 or 4.1.2. This is important to keep in mind,
+when using a newer distribution, since they come with newer compilers, and those might lead to unpredictable behaviour.
+
+Ok, so we have all tools we will need to install XM/eRTL, next we need to fetch XM/eRTL itself. In the next step, we will 
+download XM/eRTL from the ftp server at the DSLAB at Lanzhou University. % or from xtratum.org ???
+
+%TODO: add URL!!!
+%TODO: maybe add a tree instead of all the ls??
+\begin{verbatim}
+# wget http://URL/xmertl-4.0-rc1.tar.gz
+# tar xzvf xmertl-4.0-rc1.tar.gz
+\end{verbatim}
+
+So let's have a look at the content of this tar ball. Below you can see the content in a tree structure. The main parts
+are the documentation in \texttt{docs}, which contains this document, \texttt{partikle} and \texttt{xtratum} which 
+will be configured and installed in the following sections, and \texttt{tests} which contains a collection of simple
+test applications which check the different subsystems of XtratuM, to verfiy that the installation succeeded.
+
+
+% I produced this with "tree -i -L 2 xmertl-4.0-rc1
+% first I used -L 3, but the tree gets a little long then...
+\begin{verbatim}
+xmertl-4.0-rc1/
+|-- docs
+|   `-- manual
+|-- partikle
+|   |-- core
+|   |-- docs
+|   |-- mkfiles
+|   |-- scripts
+|   `-- user
+|-- tests
+|   |-- fifo_tests
+|   |-- partikle_tests
+|   |-- shm_tests
+|   |-- trace_tests
+|   `-- xtratum_tests
+`-- xtratum
+    |-- arch
+    |-- devs
+    |-- include
+    |-- kernel
+    |-- patches
+    |-- user_tools
+    `-- xmtrace
+\end{verbatim}
+
+Next we download the linux kernel and patch it with the XtratuM patch. Among other things, this patch adds the 
+hooks into the kernel, which will later be used by XtratuM to run Linux as root domain (to paravirtualize it).
+To check whether the patch will succeed, we will first run it with \texttt{--dry-run}, and after this test,
+we really patch the kernel.
+
+\begin{verbatim}
+# cd /usr/src
+# wget -v http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.17.4.tar.gz
+# tar xjvf linux-2.6.17.4.tar.bz2
+# cd linux-2.6.17.4
+# patch --dry-run -p1 < ../rtlinux-4.0-rc1/xtratum/patches/xtratum_linux_2.6.17.4.patch
+# patch -p1 < ../rtlinux-4.0-rc1/xtratum/patches/xtratum_linux_2.6.17.4.patch
+\end{verbatim}
+
+After the patching succeeded, we will now configure the linux kernel. Unfortunately, there are some options, we
+have to be careful about to sucessfully install XtratuM, and get the best performance:
+
+\begin{verbatim}
+
+#make menuconfig (or xconfig or config)
+   -> General setup -> XtratuM support
+
+   -> Processor type and features -> Symmetric multi-processing support [OFF]
+   -> Processor type and features -> Preemption Model (No Forced Preemption (Server))
+   -> Processor type and features -> Local APIC support on uniprocessors [OFF]
+   -> Processor type and features -> High Memory Support (off)
+   -> Processor type and features -> Memory model (Flat Memory)
+   -> Processor type and features -> Use register arguments [OFF]
+   -> General setup -> Power Management support [OFF]
+   -> General setup -> ACPI [OFF all options]
+   -> General setup -> CPU Frequency scaling [OFF all options]
+\end{verbatim}
+
+Since the kernel is configured now, all we have left to do is to fire up the compiler, install the kernel and configure
+the bootloader:
+
+\begin{verbatim}
+#make && make modules_install
+#cp arch/i386/boot/bzImage /boot/bzImage-2.6.17.4-xm
+#mkinitramfs -o /boot/initrd.img-2.6.17.4-xm 2.6.17.4-xm.1.0
+#vim  /boot/grub/menu.lst
+\end{verbatim}
+
+
+Now add the follow entry to the grub configuration in menu.lst
+\begin{verbatim}
+title           debian, kernel 2.6.17.4 Xtratum
+root            (hd0,0)
+kernel          /boot/bzImage-2.6.17.4-xm root=/dev/hda1 ro 
+initrd          /boot/initrd.img-2.6.17.4-xm
+boot
+\end{verbatim}
+
+We assume that the /boot directory is located in the /dev/hda1 partition (being hd0 and hda1 your hard disk). If you are not
+sure what you are doing: lookout for the entries already in menu.lst and use the same entry (e.g. /dev/sda1, or whatever) as
+in the other entries.
+
+Now we are are ready to reboot the machine into the newly built XtratuM kernel.
+
+\subsection{XtratuM Installation}
+If everything went as planned, you enter the new system using the kernel with XtratuM support. Now, there are XtratuM core in this kernel, while we need to add some modules and tools of XtratuM. The modules are load to make some XtratuM device can work, and these tools are used to operate or control the XtratuM system.
+\\
+First we should compile to generate these modules and tools. So enter the subdirectory of xtratum. The file "Makefile" in the subdirectory of xtratum is used to realize this function. But you should make a modification to it. The place need to modify is the value of LINUX\_PATH. The Linux kernel file is locate in the subdirectory of XtatuM and named Linux as default, just like xtratum/linux/. But it is like this at most time. So modify or even check it to make sure the path of LINUX\_PATH is correct. The operation can be like this: LINUX\_PATH=/path/to/linux-2.6.17.4
+\begin{verbatim}
+# vim Makefile
+\end{verbatim}
+Then, we can compile them. Because the file "Makefile" support the rules about how to compile, so we just use the command "make". If you want to know how the work going on, just read the source of the file.\\
+\begin{verbatim}
+# make 
+\end{verbatim}
+After the process of compile, many modules and executable files are generated. Of course, you can refer to them by the command of "ls" or "ls -l". These new primary files are located in this directory: xtratum/, xtratum/scripts/xmloader, xtratum/devs/*/. In addition, there are some executable files we will use. These executable files are the tools we use to operate and control the system. You can refer to Tools Usage to know how to use these tools. Here, we check the file in directory xtratum/
+\begin{verbatim}
+# ls 
+arch  Changelog  COPYING  devs    include  INSTALL  kernel  Makefile  
+Modules.symvers  patches  README  user\_tools  xm.ko  xm.mod.c  xm.mod.o  xm.o
+\end{verbatim}
+
+We can tell you that these files are generated just now: Modules.symvers, xm.ko, xm.mod.o, xm.o . The file xm.ko is useful, because it is a module of the XtratuM core. Using insmod to insert this module, then we can get the supporting of new characteristic of XtratuM. 
+\begin{verbatim}
+# insmod xm.ko
+\end{verbatim}
+However, this command is used to insert the modules of the XtratuM core. These are some device modules and useful modules have been generated just now. These modules will be used later, so we should insert these modules. If you insert them one by one using insmod, it would waste a long time. Don't worry, you can use the executable file xmcmd.sh insert these modules easily. The executable file is a tool to load and unload the XtratuM. Here we just load the XtratuM.
+\begin{verbatim}
+# ./user_tools/scripts/xmcmd.sh -l
+<XtratuM> Detected 666.643 MHz processor
+<XtratuM> XM Serial Dev(vttyS0~vttyS15)!
+<XtratuM> XM FIFO Dev(rtf0~rtf15)!
+<XtratuM> XtratuM SHM devices build successfully!
+<XtratuM> LSHM DEVICE REGISTER SUCCESSFUL
+<XtratuM> Linux UART register Suggested!
+<XtratuM> Linux Register FIFO device successful
+\end{verbatim}
+Now, the modules have been installed and the devices have been created. We can use them. Before use, we can check the work to ensure that is all right. Just as discussed above, some modules have been inserted. Use the command lsmod to see whether these modules are overall.
+\begin{verbatim}
+# lsmod
+Module			Size  Used by
+lfifo				2720  0 
+luart				3368  0 
+lshm				3252  0 
+shm				4736  1 lshm
+rtfifo			3968  1 lfifo
+serial			5124  1 luart
+xm				38824  3 shm,rtfifo,serial
+\end{verbatim}
+If these seven modules are listed in you screen, you can think that these modules inserting step is all right,. At the same time, some devices are created. These devices are these: rtf0, rtf1, ... , rtf15, shm0, shm1, ... , shm15, VttyS. All of them are located in the directory /dev/, so you can check them use the command list. Here list the rt-fifo¡¯s devices. You can list the others like this:
+\begin{verbatim}
+# ls /dev/rtf*
+rtf0   rtf1   rtf10  rtf11  rtf12  rtf13  rtf14  rtf15  rtf2   
+rtf3   rtf4   rtf5   rtf6   rtf7   rtf8   rtf9
+\end{verbatim}
+Progress smoothly. Of course, only it can work for some task, we can say it is successful. So here is an application to test whether it can work or not. The application is used to create a simple domain. When it is load, it will print a string "hola" to tell us that it can run successfully.
+\\
+Ok, let's compile the domain and load it. First enter the directory of the application, which located at xtratum/user\_tools/examples/trivial\_domain. Then compile it. 
+\begin{verbatim}
+# cd /path/to/trivial\_domain
+# make
+\end{verbatim}
+After compile, a new domain named trivial.xmd is generated. We use the tools loader.xm to load it. You can learn more information from the Tools Usage. To convenient, we set the PATH contains the path of loader.xm. Then we can use it as loader.xm in place of /path/to/loader.xm.
+\begin{verbatim}
+# export PATH=$PATH:/path/to/rtlinux-4.0-rc1/xtratum/user_tools/xmloader
+# loader.xm trivial.xmd
+>> Loading the domain "trivial.xmd (trivial.xmd)" ... Ok (Id: 1)
+\end{verbatim}
+If it returns a message like: "... Ok (Id: X)", it tell you that the domain load successfully. The return value of Id is assigned for this domain. Every domain loaded successfully can get a id. The first loaded domain gets the id 1, and the second get 2, and so on. The id is used to unload the domain by unloader.xm. Refer to Tools Usage. Remeber that id of the domain load just now is 1.
+\\
+The domain loaded successfully, then we can display message about it by "dmseg". The command "dmseg" is very useful for display the message about the system and domains. The message of domain displayed is just the message output to stand out. More information about dsmeg can refer to \cite{10}.
+\begin{verbatim}
+# dmesg
+\end{verbatim}
+If it went as planned, you can see the string "hola" at the bottom of the displayed message. If so, we just tell you it can work. The following work about the test is to unload the domain
+\begin{verbatim}
+# unloader.xm -id 1
+>> Unloading the domain "(1)" ... OK
+\end{verbatim}
+There are some problems may be you will come cross.
+\begin{verbatim}
+# loader.xm trivial.xm
+>> Loading the domain "trivial.xmd (trivial.xmd)" ... Failed (Error: -19)
+\end{verbatim}
+This is because you insmod xm.ko, but not load XtratuM, so you should execute /path/to/rtlinux-4.0-rc1/xtratum/user\_tools/scripts/xmcmd.sh -l
+\begin{verbatim}
+# loader.xm trivial.xm
+>> Loading the domain "trivial.xmd (trivial.xmd)" ... Segmentation fault
+\end{verbatim}
+
+At most time, you did not execut xmcmd.sh -l. So you had better check the modules by lsmod before executing loader.xm.
+\\
+In addition, another domain can be used for test and serial operation. This domain is located at xtratum/user\_tools/serial. As said top, you can enter this directory, compile to generate the domain and load it. When load we support a priority to the domain, which is 1. If you have read the introduce document, you would know that there are 1024 priorities from 0 to 1023 in XtratuM. The bigger the value is, the lower its priority is. If you know these, you can support the other priority to this domain.
+\begin{verbatim}
+# cd /path/to/serial
+# make
+# loader.xm serial.xmd -prio 1
+>> Loading the domain "serial.xmd (serial.xmd)" ... Ok (Id: 2)
+\end{verbatim}
+This domain does not output message to the stand out. However, we cat get information about the domains loaded and not unloaded by /proc/xtratum.
+\begin{verbatim}
+# cat /proc/xtratum 
+XtratuM domains:
+----------------
+(2) serial.xmd:
+    Priority: 1 
+    Intercepted events: 0x10
+     Masked events: 0xffffffef
+     Pending events: 0x0
+     Events' flag is enabled
+    Current state: SUSPENDED
+    Domain's state word: 0x1
+(0) Linux:
+    Priority: 1023 (MIN. PRIORITY)
+    Intercepted events: 0xffff
+     Masked events: 0xffff0000
+     Pending events: 0x0
+     Events' flag is enabled
+    Current state: ACTIVE
+    Domain's state word: 0x0
+\end{verbatim}
+"(2) serial.xmd:" is the message about the domain serial.xm. The digit 2 ahead is the domain id. And we can get more information about this domain. Its Priority is 1, and its state is SUSPENDED. "(0) Linux:" is the message about the root domain Linux. We can also know the related information. If you look carefully, you can find that there is no domain whose id is 1. Do not forget, we have unloaded it above. 
+\\
+In additional, if you load the domain with setting the priority, then its priority is 30.
+
+
+
+\subsection{PaRTiKle Installation}
+\subsubsection{About Partikle}
+PaRTiKle is a real-time kernel and it is open source. It is under GNU Public License, PaRTiKle was designed to be POSIX compatible. The native API is "C". It can run on a operating system as a thread or a domain which will be introduced next. \\
+PaRTiKle is very small, maybe 890kb is the largest. It is a full-featured, flexible, configurable, real time embedded kernel. The kernel provides thread scheduling, synchronization, timer, and communication primitives. It handles hardware resources such as interrupts, exceptions, memory, timers, etc. You can get more information from:\cite{9}.
+\subsubsection{PaRTiKle in XM/eRTL}
+XtratuM is a hypervisor that it is used to embedded real-time system. It can concurrently run several  OSes on XtratuM. If there is no real-time operating system on XtratuM, it is useless. So, PaRTiKle, as a good embedded real-time operating system, can meet the needs well and it is very small. PaRTiKle is used to run as a domain on XtratuM.
+\\
+It supports running several PaRTiKle domains concurrently, so you may see a PaRTiKle domain as a thread, Each PaRTiKle domain has its own independ space to run application. You can build several PaRTiKle domains and they can communicate by FIFO. If you load several PaRTiKle domains with different priorities , it can meet the real-time needs well because of the scheduling of XtratuM.
+
+\subsubsection{Requirements for installing partikle}
+The development environment requires intel architecture pc running linux. Disk space are minimal(less than 32MB ). We have tested it successfully on debian 4.0 and slackware 11.0.
+Partikle has been compiled successfully on the following tools :
+- Gnu C: 3.4.6 or 4.1.2
+- Gnu make: 3.81beta4
+- binutils: 2.16.91 or 2.17-3
+- util-linux: 2.12r
+- module-init-tools: 3.2.2
+- Linux C Library: 2.3.6 or 2.5
+- Dynamic linker (ldd): 2.3.6 or 2.5
+- Procps: 3.2.6 or 3.2.7-3
+- Net-tools: 1.60
+- Console-tools: 0.2.3
+- ncurses-lib: 5.0 or 5.6
+\subsubsection{Installation}
+
+If you have download the PaRTiKle package successully, you can compile PaRTiKle now.\\
+Before compiling,  configure PaRTiKle should be done.
+
+\begin{verbatim}
+
+#cd [PaRTiKle dir]
+#make menuconfig (or make config)
+checking the following options:
+Architecture (XtratuM domain)  --->  
+Devices       --->   [*] Enable the serial uart device (i8250 Based)
+                     [*] Enable XtratuM fifos
+                     [*] Enable XtratuM SHM 
+Core Options  --->   (2097152) Kernel dynamic memory
+		     (1047552) User dynamic memory 
+Ulibc Options --->   [*] Include error messages for the codes in errno.h
+\end{verbatim}
+
+The meaning of the above options: The architecture is XtratuM domain,because we want PaRTiKle to run as a domain on XtratuM. The three options in devices make PaRTiKle can execute communication by serial ports and XtratuM fifo and shm. FIFO means first in first out. SHM means share memory. FIFO and SHM are both inter-domain-communication tools on XtratuM. 2MB for kernel dynamic memory and 1MB for user dynamic memory for PaRTiKle domain is enough. The Ulibc Options support debugging.
+\\
+Compiling PaRTiKle: Because the compiles rules are defined in Makefile,you just need to make it:
+\begin{verbatim}
+#make
+>> Detected PaRTiKle path: /home/lvqq/rtlinux-4.0-rc1/PaRTiKle
+>> Building PaRTiKle utils: done                 
+>> Building PaRTiKle kernel [xm_i386]: done                          
+>> Building PaRTiKle user libraries: done                  
+>> Include these in your profile environment:
+PRTK=/home/lvqq/rtlinux-4.0-rc1/PaRTiKle export PRTK
+PATH=$PATH:$PRTK/user/bin export PATH 
+\end{verbatim}
+
+When PaRTiKle is compiled successfully, the PRTK and PATH will be set in your system. How about your installation? The test can be done now.There are  many examples in user/examples/c\_examples which can be used to test the whole system.
+\begin{verbatim}
+#cd [PaRTiKle dir]/user/examples/c_examples
+#make
+\end{verbatim}
+then you will get many *.prtk files which contain PaRTiKle kernel and the application code compiled jointly. you can write a prtk domain by yourself as following:
+\begin{verbatim}
+#vi  hello.c
+#include<stdio.h>
+int main(int argc,char **argv)
+{
+	printf("hello\n");
+	return 0;
+}
+\end{verbatim}
+then compiling it:\\
+\begin{verbatim}
+#make
+\end{verbatim}
+you will get the hello.prtk,load it by the command which is locate in xtratum/user\_tools/xmloader/loader.xm:
+\begin{verbatim}
+#[XtratuM dir]/user_tools/xmloader/loader.xm hello.prtk  
+>> Loading the domain "hello.prtk (hello.prtk)" ... Ok (Id: 1)
+\end{verbatim}
+The Id 1 is your domain id number , you can use it to unload the domain just like unloader.xm -id <Id number>
+\begin{verbatim}
+#dmesg
+>> PaRTiKle Core <<
+Detected 2800.456 MHz processor.
+Setting up the dynamic memory manager (2048 kbytes at 0x200400c)
+Free system memory 3071 Kb
+PaRTiKle (59 Kb [.text=38 .data=7 .rodata=2 .bss=7] Kb) 
+App. (30 Kb [.text=17 .data=1 .rodata=6 .bss=0] Kb)	
+- init console: ok
+- init root: ok
+- init rtf: ok
+- init shm: ok
+\end{verbatim}
+unload the test domain:
+\begin{verbatim}
+#[XtratuM dir]/user_tools/xmloader/unloader.xm -id 1  
+>> Unloading the domain "(1)" ... OK
+\end{verbatim}
+
+If the result showed is same as above, congratulation, you have installed XM/eRTL successfully.
+
+\subsection{Tools Usage}
+XtratuM support some tools to manage and control the system. The tools are executabel script file and executable file generated by compile. 
+xtratum/user\_tools/scripts has some executable script files. The most useful file is xmcmd.sh. It is used to load the XtratuM modules, device drive and moduls. There are two options can be uses, ????, to load these modules. ?????, is used to unload these modules. The usage is like this:
+
+\begin{verbatim}
+$/path/to/user_tools_scripts/xmcmd.sh -l
+$/path/to/user_tools_scripts/xmcmd.sh -u
+\end{verbatim}
+
+xtratum/user\_tools/xmloader/loader.xm is used to load a domain. For example you have a domain name "dom1", you can load it like this:
+
+\begin{verbatim}
+$/path/to/xtratum/user_tools/xmloader/loader.xm dom1.
+\end{verbatim}
+
+The path is too long and hard to operate. You can add the path to global varient PATH, and use loader.xm directly.
+
+\begin{verbatim}
+$export PATH=$PATH:/path/to/user_tools/xmloader
+$loader.xm /path/to/dom1
+\end{verbatim}
+
+It is easy. But there is a limitation using this way. The PATH includes the loaderxm just effictive in this dialogue. If you restart it, or use another dialogue, you need to set it again. To avoid these trouble, you can copy the loader.xm (and unloader.xm) to the directory /usr/bin/ . It is once for all.
+Every loaded domain has its priority. The defualt priority is 30, but you can set it by yourself just using the argument "-prio". The n is the priority, which can be 0 to 1023.
+
+\begin{verbatim}
+$loader.xm /path/to/dom1 -prio n
+\end{verbatim}
+
+When the domain loads successfully, a id will return. This id is used to unload the domain. The tool of unload is also lacal in the directory xtratum/user\_tools/xmloader named unloader.xm. If you want to operate easily, you can use the ways above to set it. For example, we load the domain dom1 and get its id 2. Then we can unload it by this:
+
+\begin{verbatim}
+$unloader.xm -id 2
+\end{verbatim}
+
+After load a domain, we would want to know its information. The first tool is command "dmesg", which means display message. The message displayed on the screen is the standard output of the domain. You can see some message list above. The other tool is to look over "/proc/xmtratum" to get the information about the load domain. There is a example in the XtratuM Installation.
+

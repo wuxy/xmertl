@@ -1,0 +1,83 @@
+diff -Nur posixtestsuite/locate-test posixtestsuitepartikle/locate-test
+--- posixtestsuite/locate-test	2005-03-14 14:53:50.000000000 +0100
++++ posixtestsuitepartikle/locate-test	2007-03-05 15:59:16.000000000 +0100
+@@ -60,19 +60,19 @@
+           shift;
+           ;;
+       "--fmake")
+-          find functional/ -type f -maxdepth 2 -mindepth 2 -name "Makefile" -exec dirname '{}' ';'
++          find functional/ -maxdepth 2 -mindepth 2  -type f -name "Makefile" -exec dirname '{}' ';'
+           exit 0;
+           ;;
+       "--frun")
+-          find functional/ -type f -maxdepth 2 -mindepth 2 -name "run.sh" -exec dirname '{}' ';' 
++          find functional/ -maxdepth 2 -mindepth 2  -type f -name "run.sh" -exec dirname '{}' ';' 
+           exit 0;
+           ;;
+       "--smake")
+-          find stress/ -type f -maxdepth 2 -mindepth 2 -name "Makefile" -exec dirname '{}' ';'
++          find stress/ -maxdepth 2 -mindepth 2  -type f -name "Makefile" -exec dirname '{}' ';'
+           exit 0;
+           ;;
+       "--srun")
+-          find stress/ -type f -maxdepth 2 -mindepth 2 -name "run.sh" -exec dirname '{}' ';'
++          find stress/  -maxdepth 2 -mindepth 2  -type f -name "run.sh" -exec dirname '{}' ';'
+           exit 0;
+           ;;
+       "--help")
+@@ -116,6 +116,6 @@
+             sed 's/\.\(sh\|c\)$/.test/' 
+         else
+             cat
+-        fi
++        fi | sort
+ 
+ 
+diff -Nur posixtestsuite/Makefile posixtestsuitepartikle/Makefile
+--- posixtestsuite/Makefile	2005-03-14 14:53:41.000000000 +0100
++++ posixtestsuitepartikle/Makefile	2007-03-05 15:59:16.000000000 +0100
+@@ -63,6 +63,13 @@
+ 
+ INCLUDE = -Iinclude
+ 
++include ../../config.mk
++include ../../user/rules.mk
++
++# Use nect flag to force errors at compile time.
++# CFLAGS += -Werror-implicit-function-declaration
++
++distclean: clean
+ # FIXME: exaust cmd line length
+ clean:
+ 	@rm -f $(LOGFILE)
+@@ -77,11 +84,12 @@
+ # If the .o doesn't export main, then we don't need to link
+ .PRECIOUS: %.test
+ %.test: %.o
++#	echo  $(LDKERNEL) -o $@ $< 
+ 	@COMPLOG=$(LOGFILE).$$$$; \
+ 	[ -f $< ] || exit 0; \
+ 	{ nm -g $< | grep -q " T main"; } || \
+ 	{ echo "$(@:.test=): link: SKIP" | tee -a $(LOGFILE) && exit 0; }; \
+-	if $(CC) $(CFLAGS) $< -o $@ $(LDFLAGS) > $$COMPLOG 2>&1; \
++	if $(LDKERNEL) -o $@ $< > $$COMPLOG 2>&1; \
+ 	then \
+ 		echo "$(@:.test=): link: PASS" | tee -a $(LOGFILE); \
+ 	else \
+@@ -141,7 +149,7 @@
+ 	@echo Building timeout helper files; \
+ 	$(CC) -O2 -o $@ $< ; \
+ 	echo `$(top_builddir)/t0 0; echo $$?` > $(top_builddir)/t0.val
+-	
++
+ %.run-test: %.sh $(top_builddir)/t0
+ 	@COMPLOG=$(LOGFILE).$$$$; \
+ 	chmod +x $<; \
+@@ -162,6 +170,7 @@
+ 
+ .PRECIOUS: %.o
+ %.o: %.c
++#	echo  $(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@ 
+ 	@COMPLOG=$(LOGFILE).$$$$; \
+ 	if $(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@ $(LDFLAGS) > $$COMPLOG 2>&1; \
+ 	then \

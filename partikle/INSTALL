@@ -1,0 +1,83 @@
+1. System requirements
+======================
+
+The development environment requires an Intel architecture PC running
+Linux. Disk space requirements are minimal (less than 32 Mbytes).
+
+Compiler and tools that are known to be needed:
+
+- GCC 3.4 or 4.0 for kernel and ``C'' applications.
+- C++ 3.4 (C++ 4.0 has not been tested)
+- Make
+- ncurses (5.0 or above).
+- BASH, SH, or any other compatible shell interpreter
+
+Since it is not possible to test the compatibility of all the
+developing tools, below is a list of the tools/versions used to build
+PaRTiKle. We have used kubuntu 6.0 and 6.1.
+
+PaRTiKle has been compiled successfully with GCC 3.4.5
+
+Our tool versions are:
+
+- Gnu C: 3.4.6  
+- Gnu make: 3.81beta4
+- binutils: 2.16.91
+- util-linux: 2.12r
+- module-init-tools: 3.2.2
+- Linux C Library: 2.3.6
+- Dynamic linker (ldd): 2.3.6
+- Procps: 3.2.6
+- Net-tools: 1.60
+- Console-tools: 0.2.3
+- ncurses-lib: 5.0
+
+If you hesitate about your versions, execute the script
+scripts/ver_linux which will report a summary of your tool versions.
+
+2. Installation notes
+=====================
+
+** PaRTiKle configuration
+
+To configure PaRTiKle, execute either:
+
+$ make config
+
+or
+
+$ make menuconfig
+
+Then, from the displayed menu, chose the options that better fit your
+necessities.
+
+** PaRTiKle compilation
+
+Once PaRTiKle has been properly configured, execute:
+
+$ make
+
+Verbosity level can be adjusted by providing the next arguments:
+
+$ make V=0 (Default option. This option just reports you about
+            warnings and error, and shows you the compilation progress.)
+
+$ make V=1 (This option gives you the maximum level of verbosity)
+
+$ make Q=@ (This option only informs you about warnings and errors)
+
+On success, the kernel is ready to be used.
+
+** Your first steps with PaRTiKle
+
+Now you can test PaRTiKle by running some examples. To compile and
+build the example, follow these steps:
+
+$ pwd
+/usr/src/partikle
+$ cd user/examples/c_examples
+$ make
+
+That is, go to the c_examples directory, execute make. The build
+process creates a file named {example}.prtk for each example, which
+contains the PaRTiKle kernel and the application code compiled jointly.

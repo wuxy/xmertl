@@ -1,0 +1,257 @@
+\section{xmtrace - Trace Tool}
+
+xmtrace is a tracing tool based on the rtl\_tracer included in RTLinux/GPL, written by Michael Barabanov, and has been reimplemented 
+for the use in XtratuM. This manual only covers the use of xmtrace, detailed information on how xmtrace works internally can be 
+found in \cite{xmtrace}. This section gives a step by step introduction on how to run the simple example, and after that the
+code of the simple example is explained to allow you to use xmtrace in your application.\\
+
+\subsection{Run an Example}\label{runex}
+The first thing what we have to do, is to load the xmtrace\_shm.ko Linux kernel module. This module gets the address of the shared 
+memory devices in use and passes the address to the part of the tracer that is located in the core. At the end of the initialization,
+it starts the tracer. From this point in time the tracer is running, and tracing events can be retrieved.
+
+\begin{verbatim}
+$ insmod xmtrace/xmtrace_shm.ko
+\end{verbatim}
+
+
+\begin{verbatim}
+$ cd xmtrace
+$ ./tracer > data.raw
+\end{verbatim}
+
+switch to a second console
+
+\begin{verbatim}
+$ cd user_tools/examples/tracer
+$ ../../xmloader/./load.xm tracer.xmd
+\end{verbatim}
+
+If you switch back to the first console now, you can stop ./tracer, and have a look at data.raw. 
+In it you will see the output of the tracer that looks something like this:
+
+\begin{verbatim}
+....
+sorry no trace ready at cpos 0 (data_ready) <00000000> (overwritten) 0 finalize 0
+sorry no trace ready at cpos 0 (data_ready) <00000000> (overwritten) 0 finalize 0
+sorry no trace ready at cpos 0 (data_ready) <00000000> (overwritten) 0 finalize 0
+DUMP: cpos 0 (data_ready) <7fffffff> (overwritten) 70 finalize 101
+D 0 -181177411 hw_save_flags                 0x82 <0xce8200cc>
+D 0    165 hard cli                         0 <0xce8200a6>
+D 0    177 hw_restore_flags              0x82 <0xce8200e9>
+D 0  13435 hw_save_flags                 0x82 <0xce8200cc>
+D 0    206 hw_save_flags                 0x96 <0xce8200cc>
+D 0    327 hard cli                         0 <0xce8200a6>
+D 0    178 hw_restore_flags              0x96 <0xce8200e9>
+D 0  15054 hw_save_flags                 0x96 <0xce8200cc>
+D 0    164 hard cli                         0 <0xce8200a6>
+D 0   3257 hw_save_flags                 0x92 <0xce8200cc>
+D 0    165 hard cli                         0 <0xce8200a6>
+D 0   3801 hw_restore_flags              0x92 <0xce8200e9>
+D 0    181 hw_restore_flags              0x96 <0xce8200e9>
+D-1   4013 scheduler in                     0 <0xce82245b>
+D-1    328 hw_save_flags                 0x82 <0xce8200cc>
+D-1    183 hard cli                         0 <0xce8200a6>
+D-1   5906 hw_save_flags                 0x82 <0xce8200cc>
+D-1    440 hard cli                         0 <0xce8200a6>
+D-1    714 hw_restore_flags              0x82 <0xce8200e9>
+D-1    977 hw_save_flags                 0x92 <0xce8200cc>
+D-1    163 hard cli                         0 <0xce8200a6>
+D-1    393 hw_restore_flags              0x92 <0xce8200e9>
+D-1    170 hw_save_flags                 0x96 <0xce8200cc>
+D-1    368 hard cli                         0 <0xce8200a6>
+D-1    455 hw_save_flags                 0x92 <0xce8200cc>
+D-1    163 hard cli                         0 <0xce8200a6>
+D-1   3762 hw_restore_flags              0x92 <0xce8200e9>
+D-1    171 hw_restore_flags              0x96 <0xce8200e9>
+D-1    173 scheduler in                     0 <0xce82245b>
+D-1    162 hw_save_flags                 0x92 <0xce8200cc>
+D-1    162 hard cli                         0 <0xce8200a6>
+D-1    246 hw_save_flags                 0x96 <0xce8200cc>
+D-1    163 hard cli                         0 <0xce8200a6>
+D-1    627 hw_save_flags                 0x82 <0xce8200cc>
+D-1    406 hard cli                         0 <0xce8200a6>
+D-1    501 hw_restore_flags              0x82 <0xce8200e9>
+D-1    177 hw_restore_flags              0x96 <0xce8200e9>
+D-1    177 hw_restore_flags              0x92 <0xce8200e9>
+D-1    164 scheduler out                  0x1 <0xce8225ed>
+D 1   2920 xm-domain                   0x1267 <0xce8213fe>
+That was trace # 1 (lost 0 traces befor this trace)
+DUMP: cpos 1 (data_ready) <7ffffffe> (overwritten) 70 finalize 101
+D 1 -181114183 hw_save_flags                 0x92 <0xce8200cc>
+D 1    193 hard cli                         0 <0xce8200a6>
+D 1    259 hw_save_flags                 0x86 <0xce8200cc>
+D 1    354 hard cli                         0 <0xce8200a6>
+D 1    489 hard sti                         0 <0xce820086>
+D 1    303 hw_save_flags                0x296 <0xce8200cc>
+D 1    169 hard cli                         0 <0xce8200a6>
+D 1    541 hw_restore_flags             0x296 <0xce8200e9>
+D 1    395 hard cli                         0 <0xce8200a6>
+D 1    205 hw_restore_flags              0x86 <0xce8200e9>
+D 1    200 hw_restore_flags              0x92 <0xce8200e9>
+D 1    425 xm-domain                        0 <0xce8213fe>
+That was trace # 2 (lost 0 traces befor this trace)
+DUMP: cpos 2 (data_ready) <7ffffffc> (overwritten) 70 finalize 101
+D 1 -181110149 xm-domain                      0x1 <0xce8213fe>
+That was trace # 3 (lost 0 traces befor this trace)
+DUMP: cpos 3 (data_ready) <7ffffff8> (overwritten) 70 finalize 101
+D 1 -181109454 xm-domain                      0x2 <0xce8213fe>
+....
+\end{verbatim}
+
+First you see some lines where no trace events have happend, followed by the traces.
+Each trace starts with a line similart to this:
+
+\begin{verbatim}
+DUMP: cpos 2 (data_ready) <7ffffffc> (overwritten) 70 finalize 101
+\end{verbatim}
+
+and ends with a line like this:
+
+\begin{verbatim}
+That was trace # 3 (lost 0 traces befor this trace)
+\end{verbatim}
+
+Between these two lines, the trace events in the last trace are listed. Lets
+see what a trace event looks like:
+
+\begin{verbatim}
+D-1    164 scheduler out                  0x1 <0xce8225ed>
+\end{verbatim}
+
+D-1 donates the which domain's context the trace event has happend. In our example it happend in the XtratuM kernel context,
+therefore it is D-1. If you look at the trace, you will also find trace events that happened in domain 0 and  domain 1. \\
+Next there is the relative time to the last trace event in nanoseconds (e.g. 164ns), followed by the name of the
+trace event (e.g. scheduler out), an optional value that is passed to the tracer (e.g. 0x1 - the number of the domain
+scheduled during this scheduler call, and the address of the tracepoint.\\
+
+In the next step, we are going to resolve the addresses of the tracepoints into symbols. To do this, we first have
+to create a system map, and then send the tracing data into the symbol resolve script.\\
+
+\begin{verbatim}
+$ cd xmtrace
+$ ./createmap.sh
+$ cat data.raw | ./addr2sym.sh -m MySystem.map > data.lst
+\end{verbatim}
+
+This creates a version of the trace from above, where the addresses are resovled into symbol names + offsets:
+ 
+\begin{verbatim}
+....
+sorry no trace ready at cpos 0 (data_ready) <00000000> (overwritten) 0 finalize 0
+sorry no trace ready at cpos 0 (data_ready) <00000000> (overwritten) 0 finalize 0
+sorry no trace ready at cpos 0 (data_ready) <00000000> (overwritten) 0 finalize 0
+DUMP: cpos 0 (data_ready) <7fffffff> (overwritten) 70 finalize 101
+D 0 -181177411 hw_save_flags                 0x82 <hw_save_flags+0x1c 
+D 0    165 hard cli                         0 <hw_cli+0x16 
+D 0    177 hw_restore_flags              0x82 <hw_restore_flags+0x19 
+D 0  13435 hw_save_flags                 0x82 <hw_save_flags+0x1c 
+D 0    206 hw_save_flags                 0x96 <hw_save_flags+0x1c 
+D 0    327 hard cli                         0 <hw_cli+0x16 
+D 0    178 hw_restore_flags              0x96 <hw_restore_flags+0x19 
+D 0  15054 hw_save_flags                 0x96 <hw_save_flags+0x1c 
+D 0    164 hard cli                         0 <hw_cli+0x16 
+D 0   3257 hw_save_flags                 0x92 <hw_save_flags+0x1c 
+D 0    165 hard cli                         0 <hw_cli+0x16 
+D 0   3801 hw_restore_flags              0x92 <hw_restore_flags+0x19 
+D 0    181 hw_restore_flags              0x96 <hw_restore_flags+0x19 
+D-1   4013 scheduler in                     0 <xm_sched+0x1b 
+D-1    328 hw_save_flags                 0x82 <hw_save_flags+0x1c 
+D-1    183 hard cli                         0 <hw_cli+0x16 
+D-1   5906 hw_save_flags                 0x82 <hw_save_flags+0x1c 
+D-1    440 hard cli                         0 <hw_cli+0x16 
+D-1    714 hw_restore_flags              0x82 <hw_restore_flags+0x19 
+D-1    977 hw_save_flags                 0x92 <hw_save_flags+0x1c 
+D-1    163 hard cli                         0 <hw_cli+0x16 
+D-1    393 hw_restore_flags              0x92 <hw_restore_flags+0x19 
+D-1    170 hw_save_flags                 0x96 <hw_save_flags+0x1c 
+D-1    368 hard cli                         0 <hw_cli+0x16 
+D-1    455 hw_save_flags                 0x92 <hw_save_flags+0x1c 
+D-1    163 hard cli                         0 <hw_cli+0x16 
+D-1   3762 hw_restore_flags              0x92 <hw_restore_flags+0x19 
+D-1    171 hw_restore_flags              0x96 <hw_restore_flags+0x19 
+D-1    173 scheduler in                     0 <xm_sched+0x1b 
+D-1    162 hw_save_flags                 0x92 <hw_save_flags+0x1c 
+D-1    162 hard cli                         0 <hw_cli+0x16 
+D-1    246 hw_save_flags                 0x96 <hw_save_flags+0x1c 
+D-1    163 hard cli                         0 <hw_cli+0x16 
+D-1    627 hw_save_flags                 0x82 <hw_save_flags+0x1c 
+D-1    406 hard cli                         0 <hw_cli+0x16 
+D-1    501 hw_restore_flags              0x82 <hw_restore_flags+0x19 
+D-1    177 hw_restore_flags              0x96 <hw_restore_flags+0x19 
+D-1    177 hw_restore_flags              0x92 <hw_restore_flags+0x19 
+D-1    164 scheduler out                  0x1 <xm_sched+0x1ad 
+D 1   2920 xm-domain                   0x1267 <system_call_handler_asm_0x82+0x26 
+That was trace # 1 (lost 0 traces befor this trace)
+DUMP: cpos 1 (data_ready) <7ffffffe> (overwritten) 70 finalize 101
+D 1 -181114183 hw_save_flags                 0x92 <hw_save_flags+0x1c 
+D 1    193 hard cli                         0 <hw_cli+0x16 
+D 1    259 hw_save_flags                 0x86 <hw_save_flags+0x1c 
+D 1    354 hard cli                         0 <hw_cli+0x16 
+D 1    489 hard sti                         0 <hw_sti+0x16 
+D 1    303 hw_save_flags                0x296 <hw_save_flags+0x1c 
+D 1    169 hard cli                         0 <hw_cli+0x16 
+D 1    541 hw_restore_flags             0x296 <hw_restore_flags+0x19 
+D 1    395 hard cli                         0 <hw_cli+0x16 
+D 1    205 hw_restore_flags              0x86 <hw_restore_flags+0x19 
+D 1    200 hw_restore_flags              0x92 <hw_restore_flags+0x19 
+D 1    425 xm-domain                        0 <system_call_handler_asm_0x82+0x26 
+That was trace # 2 (lost 0 traces befor this trace)
+DUMP: cpos 2 (data_ready) <7ffffffc> (overwritten) 70 finalize 101
+D 1 -181110149 xm-domain                      0x1 <system_call_handler_asm_0x82+0x26 
+That was trace # 3 (lost 0 traces befor this trace)
+DUMP: cpos 3 (data_ready) <7ffffff8> (overwritten) 70 finalize 101
+D 1 -181109454 xm-domain                      0x2 <system_call_handler_asm_0x82+0x26 
+....
+\end{verbatim}
+
+
+\subsection{Using the Tracer}
+
+This section analyzes the example that has been run in section \ref{runex}, and shows you how to
+add tracing events into your application, and how to create new events and event-classes. This simple
+example contains everything you need to trace your own applications.
+
+\lstset{language=C}
+\begin{lstlisting}
+#include <xm_syscalls.h>
+
+void handler (int event, void *a) {
+  //write_scr ("irq 0\n", 6);
+  write_scr("hola\n", 6);
+     //pass_event (event);
+     //unmask_event (0);
+}
+
+int kmain (void) {
+  struct xmitimerval req = {{0, 200000}, {0, 0}};
+  struct xmtimespec t;
+  int i;
+
+  install_event_handler (0, handler);
+  
+  set_timer (&req, 0);
+
+  unmask_event (0);
+
+  get_time(&t);
+
+  xmtrace_user(20,4711);
+  xmtrace_user(18,4711);
+
+  xprint("nsec %lu sec %lu\n",t.tv_nsec, t.tv_sec);
+  
+  enable_events_flag();
+  while (1){
+	  for(i=0;i< 100; i++){
+			  
+  		xmtrace_user(20,i);  //RTL_TRACE_USER2
+  		xmtrace_user(18,0);  //RTL_TRACE_FINALIZE
+	  }
+  suspend_domain (0,0);
+  }
+  return 0;
+}
+
+
+\end{lstlisting}

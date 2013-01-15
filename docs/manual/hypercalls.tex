@@ -1,0 +1,17 @@
+\section{List of Hypercalls}
+\begin{itemize}
+\item	extern void exit\_domain (int status); 
+\item	extern int load\_domain (char *dname, int prio, domain\_image\_t *dimg);
+\item	extern int unload\_domain (int id);
+\item	extern int enable\_hwirq\_sys (int irq);
+\item	extern void suspend\_domain (unsigned long dev, unsigned long cmd);
+\item	extern void sync\_events (void);
+\item	extern void pass\_event (int event);
+\item	extern int write\_scr (char *buffer, int length);
+\item	extern int get\_time (struct xmtimespec *t);
+\item	extern int set\_timer (struct xmitimerval *, struct xmitimerval *);
+\item	extern unsigned long get\_cpu\_khz (void);
+\item	extern int shm\_unlink(const char *name);
+\item	extern int shm\_open(const char *name, int flag, unsigned int mode);
+\item	extern int dev\_ctl(unsigned long dev, unsigned long cmd, void *arg);
+\end{itemize}

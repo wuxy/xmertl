@@ -1,0 +1,70 @@
+1. Software description
+=======================
+
+1.1 Name: 
+	XtratuM
+1.2 Version: 
+	1.0
+1.3 Status: 
+	Stable
+Authors: 
+	Miguel Masmano [mimastel@doctor.upv.es] (UPV), 
+	Ismael Ripoll [iripoll@disca.upv.es](UPV)
+Licence: 
+	GPL
+Brief description: 
+	XtratuM ukernel
+Bugs:
+	Right now, none.
+Description:
+	XtratuM is a nanokernel that goes beyond the classical ideas
+of the nanokernel. The lower level layer that directly deals with
+hardware is commonly called HAL (Hardware Access Layer). The most real
+time kernels (MaRTE OS, ORK, S.Ha.R.K., RTLinux/GPL, etc.) access the
+hardware in a similar way. There are two hardware devices that
+directly affect the real-time capabilities of the RTOS: interrupts and
+timers. Special care has to be taken to program and manage interrupts
+in order to achieve a low latency handling. There are many harware
+devices that provide timers facilities (PIT, APIC, RTC, special IO
+boards). Handling these devices are not always easy to program since
+some of them are not present (or are hard to discover) in some
+boards. XtratuM is a thin layer of software that provides a simple and
+convenient API to access interrupt mechanims and timer
+devices. XtratuM has been optimised to meet real time requirements.
+Although XtratuM API can be used directly to implement an application,
+its has been designed to provide support to the guest operating
+system. Its API is intentionally small and simple.
+
+Benefits of using XtratuM:
+
+* Operating system developers do not have to deal with the
+complexities of interrupts and timer hardware. XtratuM developers have
+allocated a lot of time and resources to achieve the maximum
+performance of the existing hardware.
+
+* Porting of the guest RTOS to a new processor, supported by XtratuM,
+is almost immediate. The hardest part of a porting is to set up the
+boot to run the hello world program. XtratuM will give a bootable
+platform ready to run code and more.
+
+* A version of XtratuM supports multiple RTOS by sharing the hardware
+among them. Interrupts are delivered to the RTOS in daisy-chain
+fashion. An optional facility of this version will be the memory
+protection of the RTOS. In this sense, XtratuM is quite similar to
+ADEOS, but XtratuM API and functionality is much more simple.
+
+* One version of XtratuM has been designed to take advantage of
+running Linux jointly with the RTOS, that is, it is possible to
+execute concurrently the guest RTOS and Linux. In this version, Linux
+is executed in background. This mechanism provides a convenient
+framework to develop your RTOS, your RTOS is loaded as any other Linux
+kernel module and programming error (exceptions) are intercepted and
+reported by XtratuM.
+
+All version of XtratuM has the same API, so once you port (or develop)
+your RTOS to XtratuM you can get all these benefits just recompiling
+your code.
+
+It is important to point out that XtratuM does not virtualise the
+processor or the architecture as Bochs or Vmware® does. The operating
+system has to be XtratuM aware.
